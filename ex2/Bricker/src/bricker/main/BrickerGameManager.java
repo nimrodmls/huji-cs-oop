@@ -1,18 +1,14 @@
 package bricker.main;
 
 import bricker.gameobjects.Ball;
+import bricker.gameobjects.Paddle;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
-import danogl.gui.ImageReader;
-import danogl.gui.SoundReader;
-import danogl.gui.UserInputListener;
-import danogl.gui.WindowController;
-import danogl.gui.rendering.RectangleRenderable;
+import danogl.components.CoordinateSpace;
+import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-
-import java.awt.*;
 
 public class BrickerGameManager extends GameManager {
 
@@ -36,8 +32,10 @@ public class BrickerGameManager extends GameManager {
 
         Renderable ballImage =
                 imageReader.readImage("asserts/ball.png", true);
+        Sound collisionSound = soundReader.readSound(
+                "asserts/blop_cut_silenced.wav");
         GameObject ballObject =
-                new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage);
+                new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
 
         ballObject.setVelocity(Vector2.DOWN.mult(200));
         Vector2 windowDimensions = windowController.getWindowDimensions();
@@ -47,16 +45,27 @@ public class BrickerGameManager extends GameManager {
 
         Renderable paddleImage = imageReader.readImage(
                 "asserts/paddle.png", true);
-        int[] paddleHeights = new int[] {(int)windowDimensions.y() - 30, 30};
 
-        for (int height : paddleHeights) {
-            GameObject paddleObject =
-                    new GameObject(Vector2.ZERO, new Vector2(100, 15), paddleImage);
-            paddleObject.setCenter(
-                    new Vector2(windowDimensions.x() / 2, height));
+        // Create User Paddle
+        GameObject userPaddle =
+                new Paddle(
+                        Vector2.ZERO,
+                        new Vector2(100, 15),
+                        windowDimensions,
+                        paddleImage,
+                        inputListener);
+        userPaddle.setCenter(
+                new Vector2(windowDimensions.x() / 2, windowDimensions.y() - 30));
 
-            this.gameObjects().addGameObject(paddleObject);
-        }
+        this.gameObjects().addGameObject(userPaddle);
+
+        // Create CPU Paddle
+        GameObject cpuPaddle =
+                new GameObject(Vector2.ZERO, new Vector2(100, 15), paddleImage);
+        cpuPaddle.setCenter(
+                new Vector2(windowDimensions.x() / 2, 30));
+
+        this.gameObjects().addGameObject(cpuPaddle);
 
         createBoardWalls(windowDimensions);
         addBackground(imageReader, windowDimensions);
@@ -67,6 +76,7 @@ public class BrickerGameManager extends GameManager {
                 "asserts/DARK_BG2_small.jpeg", false);
         GameObject backgroundObject = new GameObject(
                 Vector2.ZERO, windowDimensions, background);
+        backgroundObject.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
         this.gameObjects().addGameObject(backgroundObject, Layer.BACKGROUND);
     }
 
@@ -75,10 +85,9 @@ public class BrickerGameManager extends GameManager {
         Vector2 verticalWall = new Vector2(WALL_WIDTH_PIXELS, windowDimensions.y());
         // Defining Position-Wall Pairs
         Vector2[][] wallPositions = new Vector2[][] {
-                { Vector2.ZERO, horizontalWall },
-                { new Vector2(0, windowDimensions.y() - WALL_WIDTH_PIXELS), horizontalWall },
-                { Vector2.ZERO, verticalWall },
-                { new Vector2(windowDimensions.x() - WALL_WIDTH_PIXELS, 0), verticalWall }
+                { Vector2.ZERO, horizontalWall }, // Top Wall
+                { Vector2.ZERO, verticalWall }, // Left Wall
+                { new Vector2(windowDimensions.x() - WALL_WIDTH_PIXELS, 0), verticalWall } // Right Wall
         };
 
         for (Vector2[] positionPair : wallPositions) {
