@@ -5,6 +5,7 @@ import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.gui.ImageReader;
 import danogl.gui.rendering.Renderable;
+import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
 
 import java.awt.*;
@@ -12,7 +13,10 @@ import java.awt.*;
 public class UserInterface extends GameObject {
     private final float HEART_WIDTH = 20;
     private final float HEART_SPACING = 10;
+
+    private final Vector2 dimensions;
     private final BrickerGameManager gameManager;
+    private final TextRenderable heartCounter;
     private GameObject[] hearts;
     private int heartCount = 0;
 
@@ -29,8 +33,19 @@ public class UserInterface extends GameObject {
                          BrickerGameManager gameManager,
                          int maxHeartCount) {
         super(topLeftCorner, dimensions, null);
+        this.dimensions = dimensions;
         this.gameManager = gameManager;
         hearts = new GameObject[maxHeartCount];
+        heartCounter = new TextRenderable(Integer.toString(heartCount));
+        heartCounter.setColor(Color.green);
+
+        GameObject heartCounterObject = new GameObject(
+                new Vector2(
+                        getTopLeftCorner().x() - 50,
+                        getTopLeftCorner().y() - 50),
+                new Vector2(30, 30),
+                heartCounter);
+        gameManager.addGameObject(heartCounterObject, Layer.UI);
     }
 
     public void addHeart(ImageReader imageReader) {
@@ -40,14 +55,18 @@ public class UserInterface extends GameObject {
 
         Renderable heartImage = imageReader.readImage(
                 "asserts/heart.png", true);
+        float heart_width = BrickerGameManager.calculateObjectWidthInRow(
+                hearts.length, HEART_SPACING, dimensions.x());
         hearts[heartCount] = new GameObject(
                 new Vector2(
-                        getTopLeftCorner().x() + (heartCount * HEART_SPACING),
+                        getTopLeftCorner().x() + (heartCount * (heart_width + HEART_SPACING)),
                         getTopLeftCorner().y()),
-                new Vector2(HEART_WIDTH, HEART_WIDTH),
+                new Vector2(heart_width, heart_width),
                 heartImage);
         gameManager.addGameObject(hearts[heartCount], Layer.UI);
         heartCount++;
+
+        updateHeartCounter();
     }
 
     public void removeHeart() {
@@ -59,6 +78,22 @@ public class UserInterface extends GameObject {
         // Removing the heart from the UI's records
         hearts[heartCount -1] = null;
         heartCount--;
+
+        updateHeartCounter();
     }
 
+    private void updateHeartCounter() {
+        switch (heartCount) {
+            case 1:
+                heartCounter.setColor(Color.RED);
+                break;
+            case 2:
+                heartCounter.setColor(Color.YELLOW);
+                break;
+            default:
+                heartCounter.setColor(Color.GREEN);
+                break;
+        }
+        heartCounter.setString(Integer.toString(heartCount));
+    }
 }

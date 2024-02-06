@@ -25,7 +25,8 @@ public class BrickerGameManager extends GameManager {
     private static final float WALL_WIDTH_PIXELS = 10.0f;
     private static final float BALL_SPEED = 200.0f;
     // Where in the window we start placing bricks
-    private static final Vector2 BRICK_BASE_POSITION = new Vector2(WALL_WIDTH_PIXELS*2, WALL_WIDTH_PIXELS*2);
+    private static final Vector2 BRICK_BASE_POSITION =
+            new Vector2(WALL_WIDTH_PIXELS*2, WALL_WIDTH_PIXELS*2);
 
     private final int brickCountPerRow;
     private final int brickRowCount;
@@ -39,19 +40,14 @@ public class BrickerGameManager extends GameManager {
         super(title, windowSize);
         this.brickCountPerRow = brickCountPerRow;
         this.brickRowCount = brickRowCount;
-        userInterface = new UserInterface(
-                new Vector2(10, 10),
-                new Vector2(100, 20),
-                this,
-                DEFAULT_GAME_COUNT);
     }
 
     public void addGameObject(GameObject object, int objectLayer) {
         gameObjects().addGameObject(object, objectLayer);
     }
 
-    public void removeGameObject(GameObject object, int objectLayer) {
-        gameObjects().removeGameObject(object, objectLayer);
+    public boolean removeGameObject(GameObject object, int objectLayer) {
+        return gameObjects().removeGameObject(object, objectLayer);
     }
 
     @Override
@@ -65,29 +61,23 @@ public class BrickerGameManager extends GameManager {
                 imageReader, soundReader, inputListener, windowController);
         this.windowController = windowController;
         windowDimensions = windowController.getWindowDimensions();
+        currentGameIndex = 1; // Restarting the game count
 
-        // Create Ball
+        // Collision rules in the foreground should not exist (interaction between bricks etc.)
+        gameObjects().layers().shouldLayersCollide(
+                Layer.FOREGROUND, Layer.FOREGROUND, false);
 
+        gameObjects().layers().shouldLayersCollide(
+                Layer.DEFAULT, Layer.FOREGROUND, true);
+
+
+        // Creating the Ball
         Renderable ballImage =
                 imageReader.readImage("asserts/ball.png", true);
         Sound collisionSound = soundReader.readSound(
                 "asserts/blop_cut_silenced.wav");
         ball = new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
-
-        // Initial velocity vector is selected randomly, to constant speed
-        float ballSpeedX = BALL_SPEED;
-        float ballSpeedY = BALL_SPEED;
-        Random rand = new Random();
-        if (rand.nextBoolean()) {
-            ballSpeedX *= -1;
-        } else {
-            ballSpeedY *= -1;
-        }
-
-        // Setting starting velocity vector & the starting position of the ball
-        ball.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
-        ball.setCenter(windowDimensions.mult(0.5f));
-
+        restartBall();
         this.gameObjects().addGameObject(ball);
 
         Renderable paddleImage = imageReader.readImage(
@@ -102,16 +92,31 @@ public class BrickerGameManager extends GameManager {
                         paddleImage,
                         inputListener);
         userPaddle.setCenter(
-                new Vector2(windowDimensions.x() / 2, windowDimensions.y() - 30));
+                new Vector2(windowDimensions.x() / 2, windowDimensions.y() - 40));
 
         this.gameObjects().addGameObject(userPaddle);
 
+        // Instantiating the rest of the objects
         createBoardWalls();
         addBackground(imageReader);
-
-        gameObjects().layers().shouldLayersCollide(Layer.FOREGROUND, Layer.FOREGROUND, false);
-        gameObjects().layers().shouldLayersCollide(Layer.DEFAULT, Layer.FOREGROUND, true);
         createBricks(imageReader);
+        initiateUI(imageReader);
+    }
+
+    private void restartBall() {
+        // Initial velocity vector is selected randomly, to constant speed
+        float ballSpeedX = BALL_SPEED;
+        float ballSpeedY = BALL_SPEED;
+        Random rand = new Random();
+        if (rand.nextBoolean()) {
+            ballSpeedX *= -1;
+        } else {
+            ballSpeedY *= -1;
+        }
+
+        // Setting starting velocity vector & the starting position of the ball
+        ball.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
+        ball.setCenter(windowDimensions.mult(0.5f));
     }
 
     private void addBackground(ImageReader imageReader) {
@@ -121,6 +126,18 @@ public class BrickerGameManager extends GameManager {
                 Vector2.ZERO, windowDimensions, background);
         backgroundObject.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
         this.gameObjects().addGameObject(backgroundObject, Layer.BACKGROUND);
+    }
+
+    private void initiateUI(ImageReader imageReader) {
+        userInterface = new UserInterface(
+                new Vector2(50, windowDimensions.y() - 30),
+                new Vector2(80, 40),
+                this,
+                DEFAULT_GAME_COUNT);
+        // Initializing the hearts
+        for (int iter = 0; iter < DEFAULT_GAME_COUNT; iter++) {
+            userInterface.addHeart(imageReader);
+        }
     }
 
     private void createBoardWalls() {
@@ -149,7 +166,8 @@ public class BrickerGameManager extends GameManager {
         float maxRowLength = windowDimensions.x() - (BRICK_BASE_POSITION.x() * 2);
         // Calculating the width of a single brick, in the calculation we take spaces
         // between the bricks into account
-        float brickWidth = calculateObjectWidthInRow(brickCountPerRow, BRICK_DISTANCING_PIXELS, maxRowLength);
+        float brickWidth = calculateObjectWidthInRow(
+                brickCountPerRow, BRICK_DISTANCING_PIXELS, maxRowLength);
 
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
@@ -175,15 +193,15 @@ public class BrickerGameManager extends GameManager {
         super.update(deltaTime);
         // Losing scenario
         if (ball.getCenter().y() > windowDimensions.y()) {
-            boolean continueGame = true;
+
             if (currentGameIndex < DEFAULT_GAME_COUNT) {
                 currentGameIndex++;
-                continueGame = windowController.openYesNoDialog("You lose! Play again?");
-            } else {
-                continueGame = false;
+                restartBall();
+                userInterface.removeHeart();
+                return;
             }
 
-            if (continueGame) {
+            if (windowController.openYesNoDialog("You lose! Play again?")) {
                 windowController.resetGame();
             } else {
                 windowController.closeWindow();
