@@ -12,9 +12,11 @@ import danogl.components.CoordinateSpace;
 import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
+import danogl.collisions.LayerManager;
 
 import java.awt.*;
 import java.util.Random;
+import java.util.prefs.BackingStoreException;
 
 public class BrickerGameManager extends GameManager {
 
@@ -25,7 +27,7 @@ public class BrickerGameManager extends GameManager {
     private static final float WALL_WIDTH_PIXELS = 10.0f;
     private static final float BALL_SPEED = 200.0f;
     // Where in the window we start placing bricks
-    private static final Vector2 BRICK_BASE_POSITION = new Vector2(WALL_WIDTH_PIXELS, WALL_WIDTH_PIXELS);
+    private static final Vector2 BRICK_BASE_POSITION = new Vector2(WALL_WIDTH_PIXELS*2, WALL_WIDTH_PIXELS*2);
 
     private final int brickCountPerRow;
     private final int brickRowCount;
@@ -36,8 +38,8 @@ public class BrickerGameManager extends GameManager {
         this.brickRowCount = brickRowCount;
     }
 
-    public void removeGameObject(GameObject object) {
-        gameObjects().removeGameObject(object);
+    public void removeGameObject(GameObject object, int objectLayer) {
+        gameObjects().removeGameObject(object, objectLayer);
     }
 
     @Override
@@ -93,16 +95,11 @@ public class BrickerGameManager extends GameManager {
 
         this.gameObjects().addGameObject(userPaddle);
 
-        // Create CPU Paddle
-        GameObject cpuPaddle =
-                new GameObject(Vector2.ZERO, new Vector2(100, 15), paddleImage);
-        cpuPaddle.setCenter(
-                new Vector2(windowDimensions.x() / 2, 30));
-
-        this.gameObjects().addGameObject(cpuPaddle);
-
         createBoardWalls(windowDimensions);
         addBackground(imageReader, windowDimensions);
+
+        gameObjects().layers().shouldLayersCollide(Layer.FOREGROUND, Layer.FOREGROUND, false);
+        gameObjects().layers().shouldLayersCollide(Layer.DEFAULT, Layer.FOREGROUND, true);
         createBricks(imageReader, windowDimensions);
     }
 
@@ -138,7 +135,7 @@ public class BrickerGameManager extends GameManager {
 
         // Calculating the amount of pixels that the bricks can take up
         // this does not include the walls, since the player cannot reach
-        float maxRowLength = windowDimensions.x() - (WALL_WIDTH_PIXELS * 2);
+        float maxRowLength = windowDimensions.x() - (BRICK_BASE_POSITION.x() * 2);
         // Calculating the width of a single brick, in the calculation we take spaces
         // between the bricks into account
         float brickWidth =
@@ -158,7 +155,7 @@ public class BrickerGameManager extends GameManager {
                         brickImage,
                         new BasicCollisionStrategy(this));
 
-                this.gameObjects().addGameObject(brickObject);
+                this.gameObjects().addGameObject(brickObject, Layer.FOREGROUND);
             }
         }
     }
