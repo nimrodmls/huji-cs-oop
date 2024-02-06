@@ -18,10 +18,15 @@ import java.util.Random;
 
 public class BrickerGameManager extends GameManager {
 
+    private static final int BRICK_DISTANCING_PIXELS = 3;
+    private static final int BRICK_HEIGHT_PIXELS = 15;
     private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
     private static final int DEFAULT_BRICK_ROW_COUNT = 7;
     private static final float WALL_WIDTH_PIXELS = 10.0f;
     private static final float BALL_SPEED = 200.0f;
+    // Where in the window we start placing bricks
+    private static final Vector2 BRICK_BASE_POSITION = new Vector2(WALL_WIDTH_PIXELS, WALL_WIDTH_PIXELS);
+
     private final int brickCountPerRow;
     private final int brickRowCount;
 
@@ -130,12 +135,32 @@ public class BrickerGameManager extends GameManager {
     private void createBricks(ImageReader imageReader, Vector2 windowDimensions) {
         Renderable brickImage = imageReader.readImage(
                 "asserts/brick.png", false);
-        GameObject brickObject = new Brick(
-                Vector2.ZERO, new Vector2(windowDimensions.x() - 20, 15), brickImage, new BasicCollisionStrategy(this));
-        brickObject.setCenter(
-                new Vector2(windowDimensions.x() / 2, windowDimensions.y() / 6));
-        this.gameObjects().addGameObject(brickObject);
 
+        // Calculating the amount of pixels that the bricks can take up
+        // this does not include the walls, since the player cannot reach
+        float maxRowLength = windowDimensions.x() - (WALL_WIDTH_PIXELS * 2);
+        // Calculating the width of a single brick, in the calculation we take spaces
+        // between the bricks into account
+        float brickWidth =
+                (maxRowLength - ((brickCountPerRow - 1) * BRICK_DISTANCING_PIXELS)) / brickCountPerRow;
+
+        // Creating the bricks, row after row
+        for (int row = 0; row < brickRowCount; row++) {
+            for (int col = 0; col < brickCountPerRow; col++) {
+
+                Vector2 brickPosition = BRICK_BASE_POSITION.add(new Vector2(
+                        col * (brickWidth + BRICK_DISTANCING_PIXELS),
+                        row * (BRICK_HEIGHT_PIXELS + BRICK_DISTANCING_PIXELS)));
+
+                GameObject brickObject = new Brick(
+                        brickPosition,
+                        new Vector2(brickWidth, BRICK_HEIGHT_PIXELS),
+                        brickImage,
+                        new BasicCollisionStrategy(this));
+
+                this.gameObjects().addGameObject(brickObject);
+            }
+        }
     }
 
     public static void main(String[] args) {
