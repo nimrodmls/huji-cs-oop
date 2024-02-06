@@ -3,6 +3,7 @@ package bricker.main;
 import bricker.brick_strategies.BasicCollisionStrategy;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
+import bricker.gameobjects.BrickGrid;
 import bricker.gameobjects.Paddle;
 import bricker.gameobjects.UserInterface;
 import danogl.GameManager;
@@ -164,26 +165,22 @@ public class BrickerGameManager extends GameManager {
         // Calculating the amount of pixels that the bricks can take up
         // this does not include the walls, since the player cannot reach
         float maxRowLength = windowDimensions.x() - (BRICK_BASE_POSITION.x() * 2);
-        // Calculating the width of a single brick, in the calculation we take spaces
-        // between the bricks into account
-        float brickWidth = calculateObjectWidthInRow(
-                brickCountPerRow, BRICK_DISTANCING_PIXELS, maxRowLength);
+
+        BrickGrid brickGrid = new BrickGrid(
+                BRICK_BASE_POSITION,
+                new Vector2(brickRowCount, brickCountPerRow),
+                BRICK_HEIGHT_PIXELS,
+                maxRowLength,
+                this);
+        gameObjects().addGameObject(brickGrid, Layer.BACKGROUND);
 
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-
-                Vector2 brickPosition = BRICK_BASE_POSITION.add(new Vector2(
-                        col * (brickWidth + BRICK_DISTANCING_PIXELS),
-                        row * (BRICK_HEIGHT_PIXELS + BRICK_DISTANCING_PIXELS)));
-
-                GameObject brickObject = new Brick(
-                        brickPosition,
-                        new Vector2(brickWidth, BRICK_HEIGHT_PIXELS),
+                brickGrid.addObject(
+                        col, row,
                         brickImage,
                         new BasicCollisionStrategy(this));
-
-                this.gameObjects().addGameObject(brickObject, Layer.FOREGROUND);
             }
         }
     }
