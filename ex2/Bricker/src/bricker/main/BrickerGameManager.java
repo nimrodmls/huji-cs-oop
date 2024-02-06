@@ -1,10 +1,10 @@
 package bricker.main;
 
 import bricker.brick_strategies.BasicCollisionStrategy;
-import bricker.brick_strategies.CollisionStrategy;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.Paddle;
+import bricker.gameobjects.UserInterface;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -12,14 +12,12 @@ import danogl.components.CoordinateSpace;
 import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import danogl.collisions.LayerManager;
 
-import java.awt.*;
 import java.util.Random;
-import java.util.prefs.BackingStoreException;
 
 public class BrickerGameManager extends GameManager {
 
+    private static final int DEFAULT_GAME_COUNT = 3;
     private static final int BRICK_DISTANCING_PIXELS = 3;
     private static final int BRICK_HEIGHT_PIXELS = 15;
     private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
@@ -31,11 +29,25 @@ public class BrickerGameManager extends GameManager {
 
     private final int brickCountPerRow;
     private final int brickRowCount;
+    private Ball ball;
+    private Vector2 windowDimensions;
+    private WindowController windowController;
+    private int currentGameIndex = 1;
+    private UserInterface userInterface;
 
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
         this.brickCountPerRow = brickCountPerRow;
         this.brickRowCount = brickRowCount;
+        userInterface = new UserInterface(
+                new Vector2(10, 10),
+                new Vector2(100, 20),
+                this,
+                DEFAULT_GAME_COUNT);
+    }
+
+    public void addGameObject(GameObject object, int objectLayer) {
+        gameObjects().addGameObject(object, objectLayer);
     }
 
     public void removeGameObject(GameObject object, int objectLayer) {
@@ -51,8 +63,8 @@ public class BrickerGameManager extends GameManager {
 
         super.initializeGame(
                 imageReader, soundReader, inputListener, windowController);
-
-        Vector2 windowDimensions = windowController.getWindowDimensions();
+        this.windowController = windowController;
+        windowDimensions = windowController.getWindowDimensions();
 
         // Create Ball
 
@@ -60,8 +72,7 @@ public class BrickerGameManager extends GameManager {
                 imageReader.readImage("asserts/ball.png", true);
         Sound collisionSound = soundReader.readSound(
                 "asserts/blop_cut_silenced.wav");
-        GameObject ballObject =
-                new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
+        ball = new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
 
         // Initial velocity vector is selected randomly, to constant speed
         float ballSpeedX = BALL_SPEED;
@@ -74,10 +85,10 @@ public class BrickerGameManager extends GameManager {
         }
 
         // Setting starting velocity vector & the starting position of the ball
-        ballObject.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
-        ballObject.setCenter(windowDimensions.mult(0.5f));
+        ball.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
+        ball.setCenter(windowDimensions.mult(0.5f));
 
-        this.gameObjects().addGameObject(ballObject);
+        this.gameObjects().addGameObject(ball);
 
         Renderable paddleImage = imageReader.readImage(
                 "asserts/paddle.png", true);
@@ -95,15 +106,15 @@ public class BrickerGameManager extends GameManager {
 
         this.gameObjects().addGameObject(userPaddle);
 
-        createBoardWalls(windowDimensions);
-        addBackground(imageReader, windowDimensions);
+        createBoardWalls();
+        addBackground(imageReader);
 
         gameObjects().layers().shouldLayersCollide(Layer.FOREGROUND, Layer.FOREGROUND, false);
         gameObjects().layers().shouldLayersCollide(Layer.DEFAULT, Layer.FOREGROUND, true);
-        createBricks(imageReader, windowDimensions);
+        createBricks(imageReader);
     }
 
-    private void addBackground(ImageReader imageReader, Vector2 windowDimensions) {
+    private void addBackground(ImageReader imageReader) {
         Renderable background = imageReader.readImage(
                 "asserts/DARK_BG2_small.jpeg", false);
         GameObject backgroundObject = new GameObject(
@@ -112,7 +123,7 @@ public class BrickerGameManager extends GameManager {
         this.gameObjects().addGameObject(backgroundObject, Layer.BACKGROUND);
     }
 
-    private void createBoardWalls(Vector2 windowDimensions) {
+    private void createBoardWalls() {
         Vector2 horizontalWall = new Vector2(windowDimensions.x(), WALL_WIDTH_PIXELS);
         Vector2 verticalWall = new Vector2(WALL_WIDTH_PIXELS, windowDimensions.y());
         // Defining Position-Wall Pairs
@@ -129,7 +140,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
-    private void createBricks(ImageReader imageReader, Vector2 windowDimensions) {
+    private void createBricks(ImageReader imageReader) {
         Renderable brickImage = imageReader.readImage(
                 "asserts/brick.png", false);
 
@@ -138,8 +149,7 @@ public class BrickerGameManager extends GameManager {
         float maxRowLength = windowDimensions.x() - (BRICK_BASE_POSITION.x() * 2);
         // Calculating the width of a single brick, in the calculation we take spaces
         // between the bricks into account
-        float brickWidth =
-                (maxRowLength - ((brickCountPerRow - 1) * BRICK_DISTANCING_PIXELS)) / brickCountPerRow;
+        float brickWidth = calculateObjectWidthInRow(brickCountPerRow, BRICK_DISTANCING_PIXELS, maxRowLength);
 
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
@@ -158,6 +168,33 @@ public class BrickerGameManager extends GameManager {
                 this.gameObjects().addGameObject(brickObject, Layer.FOREGROUND);
             }
         }
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        // Losing scenario
+        if (ball.getCenter().y() > windowDimensions.y()) {
+            boolean continueGame = true;
+            if (currentGameIndex < DEFAULT_GAME_COUNT) {
+                currentGameIndex++;
+                continueGame = windowController.openYesNoDialog("You lose! Play again?");
+            } else {
+                continueGame = false;
+            }
+
+            if (continueGame) {
+                windowController.resetGame();
+            } else {
+                windowController.closeWindow();
+            }
+        }
+    }
+
+    public static float calculateObjectWidthInRow(int objectCount,
+                                                  float objectSpacing,
+                                                  float rowLength) {
+        return (rowLength - ((objectCount - 1) * objectSpacing)) / objectCount;
     }
 
     public static void main(String[] args) {
