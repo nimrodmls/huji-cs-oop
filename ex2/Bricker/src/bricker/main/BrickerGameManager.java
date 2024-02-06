@@ -1,6 +1,9 @@
 package bricker.main;
 
+import bricker.brick_strategies.BasicCollisionStrategy;
+import bricker.brick_strategies.CollisionStrategy;
 import bricker.gameobjects.Ball;
+import bricker.gameobjects.Brick;
 import bricker.gameobjects.Paddle;
 import danogl.GameManager;
 import danogl.GameObject;
@@ -10,12 +13,26 @@ import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+import java.awt.*;
+import java.util.Random;
+
 public class BrickerGameManager extends GameManager {
 
-    private final float WALL_WIDTH_PIXELS = 10.0f;
+    private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
+    private static final int DEFAULT_BRICK_ROW_COUNT = 7;
+    private static final float WALL_WIDTH_PIXELS = 10.0f;
+    private static final float BALL_SPEED = 200.0f;
+    private final int brickCountPerRow;
+    private final int brickRowCount;
 
-    public BrickerGameManager(String title, Vector2 windowSize) {
+    public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
+        this.brickCountPerRow = brickCountPerRow;
+        this.brickRowCount = brickRowCount;
+    }
+
+    public void removeGameObject(GameObject object) {
+        gameObjects().removeGameObject(object);
     }
 
     @Override
@@ -28,6 +45,8 @@ public class BrickerGameManager extends GameManager {
         super.initializeGame(
                 imageReader, soundReader, inputListener, windowController);
 
+        Vector2 windowDimensions = windowController.getWindowDimensions();
+
         // Create Ball
 
         Renderable ballImage =
@@ -37,8 +56,18 @@ public class BrickerGameManager extends GameManager {
         GameObject ballObject =
                 new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
 
-        ballObject.setVelocity(Vector2.DOWN.mult(200));
-        Vector2 windowDimensions = windowController.getWindowDimensions();
+        // Initial velocity vector is selected randomly, to constant speed
+        float ballSpeedX = BALL_SPEED;
+        float ballSpeedY = BALL_SPEED;
+        Random rand = new Random();
+        if (rand.nextBoolean()) {
+            ballSpeedX *= -1;
+        } else {
+            ballSpeedY *= -1;
+        }
+
+        // Setting starting velocity vector & the starting position of the ball
+        ballObject.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
         ballObject.setCenter(windowDimensions.mult(0.5f));
 
         this.gameObjects().addGameObject(ballObject);
@@ -69,6 +98,7 @@ public class BrickerGameManager extends GameManager {
 
         createBoardWalls(windowDimensions);
         addBackground(imageReader, windowDimensions);
+        createBricks(imageReader, windowDimensions);
     }
 
     private void addBackground(ImageReader imageReader, Vector2 windowDimensions) {
@@ -97,9 +127,39 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    private void createBricks(ImageReader imageReader, Vector2 windowDimensions) {
+        Renderable brickImage = imageReader.readImage(
+                "asserts/brick.png", false);
+        GameObject brickObject = new Brick(
+                Vector2.ZERO, new Vector2(windowDimensions.x() - 20, 15), brickImage, new BasicCollisionStrategy(this));
+        brickObject.setCenter(
+                new Vector2(windowDimensions.x() / 2, windowDimensions.y() / 6));
+        this.gameObjects().addGameObject(brickObject);
+
+    }
+
     public static void main(String[] args) {
-        BrickerGameManager gameManager = new BrickerGameManager(
-                "Bricker", new Vector2(700, 500));
+        BrickerGameManager gameManager;
+
+        if (2 > args.length) {
+            gameManager = new BrickerGameManager(
+                    "Bricker",
+                    new Vector2(700, 500),
+                    DEFAULT_BRICK_COUNT_PER_ROW,
+                    DEFAULT_BRICK_ROW_COUNT);
+        }
+        else if (2 == args.length) {
+            gameManager = new BrickerGameManager(
+                    "Bricker",
+                    new Vector2(700, 500),
+                    Integer.parseInt(args[0]),
+                    Integer.parseInt(args[1]));
+        }
+        else {
+            System.out.println("Usage: Bricker [brickCountPerRow] [brickRowCount]");
+            return;
+        }
+
         gameManager.run();
     }
 }
