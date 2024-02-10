@@ -14,6 +14,7 @@ import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class BrickerGameManager extends GameManager {
@@ -38,6 +39,7 @@ public class BrickerGameManager extends GameManager {
     private WindowController windowController;
     private int currentGameIndex = 1;
     private UserInterface userInterface;
+    private UserInputListener userInputListener;
 
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
@@ -63,6 +65,7 @@ public class BrickerGameManager extends GameManager {
         super.initializeGame(
                 imageReader, soundReader, inputListener, windowController);
         this.windowController = windowController;
+        this.userInputListener = inputListener;
         windowDimensions = windowController.getWindowDimensions();
         currentGameIndex = 1; // Restarting the game count
 
@@ -188,7 +191,12 @@ public class BrickerGameManager extends GameManager {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        // Losing scenario
+        endgameHandler();
+    }
+
+    private void endgameHandler() {
+        String prompt;
+        // Losing scenario - Ball left the window (from below)
         if (ball.getCenter().y() > windowDimensions.y()) {
 
             if (currentGameIndex < DEFAULT_GAME_COUNT) {
@@ -198,25 +206,22 @@ public class BrickerGameManager extends GameManager {
                 return;
             }
 
-            if (windowController.openYesNoDialog("You lose! Play again?")) {
-                windowController.resetGame();
-            } else {
-                windowController.closeWindow();
-            }
+            prompt = "You lose! Play again?";
         }
-        else if (0 == brickGrid.getBrickCount()) {
-            if (windowController.openYesNoDialog("You win! Play again?")) {
-                windowController.resetGame();
-            } else {
-                windowController.closeWindow();
-            }
+        // Winning scenario - No bricks or user pressed 'W' button
+        else if (0 == brickGrid.getBrickCount() || userInputListener.isKeyPressed(KeyEvent.VK_W)) {
+            prompt = "You win! Play again?";
+        // No win or lose - the game should continue normally
+        } else {
+            return;
         }
-    }
 
-    public static float calculateObjectWidthInRow(int objectCount,
-                                                  float objectSpacing,
-                                                  float rowLength) {
-        return (rowLength - ((objectCount - 1) * objectSpacing)) / objectCount;
+        // If we reached here then the game has ended, we should ask the user whether to reset
+        if (windowController.openYesNoDialog(prompt)) {
+            windowController.resetGame();
+        } else {
+            windowController.closeWindow();
+        }
     }
 
     public static void main(String[] args) {
