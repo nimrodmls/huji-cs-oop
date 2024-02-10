@@ -1,11 +1,14 @@
 package bricker.main;
 
 import bricker.brick_strategies.BasicCollisionStrategy;
+import bricker.brick_strategies.PuckStrategy;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.BrickGrid;
 import bricker.gameobjects.Paddle;
 import bricker.gameobjects.UserInterface;
+import bricker.utilities.GameConstants;
+import bricker.utilities.Utils;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -40,6 +43,7 @@ public class BrickerGameManager extends GameManager {
     private int currentGameIndex = 1;
     private UserInterface userInterface;
     private UserInputListener userInputListener;
+    private SoundReader soundReader;
 
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
@@ -66,6 +70,7 @@ public class BrickerGameManager extends GameManager {
                 imageReader, soundReader, inputListener, windowController);
         this.windowController = windowController;
         this.userInputListener = inputListener;
+        this.soundReader = soundReader;
         windowDimensions = windowController.getWindowDimensions();
         currentGameIndex = 1; // Restarting the game count
 
@@ -82,8 +87,8 @@ public class BrickerGameManager extends GameManager {
                 imageReader.readImage("asserts/ball.png", true);
         Sound collisionSound = soundReader.readSound(
                 "asserts/blop_cut_silenced.wav");
-        ball = new Ball(Vector2.ZERO, new Vector2(20, 20), ballImage, collisionSound);
-        restartBall();
+        ball = new Ball(Vector2.ZERO, GameConstants.PRIMARY_BALL_DIMENSIONS, ballImage, collisionSound);
+        restartBall(ball, windowDimensions);
         this.gameObjects().addGameObject(ball);
 
         Renderable paddleImage = imageReader.readImage(
@@ -109,19 +114,8 @@ public class BrickerGameManager extends GameManager {
         initiateUI(imageReader);
     }
 
-    private void restartBall() {
-        // Initial velocity vector is selected randomly, to constant speed
-        float ballSpeedX = BALL_SPEED;
-        float ballSpeedY = BALL_SPEED;
-        Random rand = new Random();
-        if (rand.nextBoolean()) {
-            ballSpeedX *= -1;
-        } else {
-            ballSpeedY *= -1;
-        }
-
-        // Setting starting velocity vector & the starting position of the ball
-        ball.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
+    private static void restartBall(Ball ball, Vector2 windowDimensions) {
+        Utils.randomizeBallVelocity(ball, BALL_SPEED);
         ball.setCenter(windowDimensions.mult(0.5f));
     }
 
@@ -183,7 +177,7 @@ public class BrickerGameManager extends GameManager {
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new BasicCollisionStrategy(this, brickGrid));
+                brickGrid.addObject(col, row, brickImage, new PuckStrategy(this, brickGrid, 2, soundReader, imageReader));
             }
         }
     }
@@ -201,14 +195,14 @@ public class BrickerGameManager extends GameManager {
 
             if (currentGameIndex < DEFAULT_GAME_COUNT) {
                 currentGameIndex++;
-                restartBall();
+                restartBall(ball, windowDimensions);
                 userInterface.removeHeart();
                 return;
             }
 
             prompt = "You lose! Play again?";
         }
-        // Winning scenario - No bricks or user pressed 'W' button
+        // Winning scenario - No bricks remain or user pressed 'W' button
         else if (0 == brickGrid.getBrickCount() || userInputListener.isKeyPressed(KeyEvent.VK_W)) {
             prompt = "You win! Play again?";
         // No win or lose - the game should continue normally
