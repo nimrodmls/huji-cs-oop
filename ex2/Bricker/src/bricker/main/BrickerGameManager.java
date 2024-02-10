@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class BrickerGameManager extends GameManager {
 
+    private static final Vector2 UI_GRID_ELEMENT_DIMENSIONS = new Vector2(20, 20);
     private static final int DEFAULT_GAME_COUNT = 3;
     private static final int BRICK_DISTANCING_PIXELS = 3;
     private static final int BRICK_HEIGHT_PIXELS = 15;
@@ -32,6 +33,7 @@ public class BrickerGameManager extends GameManager {
     private final int brickCountPerRow;
     private final int brickRowCount;
     private Ball ball;
+    private BrickGrid brickGrid;
     private Vector2 windowDimensions;
     private WindowController windowController;
     private int currentGameIndex = 1;
@@ -131,11 +133,12 @@ public class BrickerGameManager extends GameManager {
 
     private void initiateUI(ImageReader imageReader) {
         userInterface = new UserInterface(
-                new Vector2(50, windowDimensions.y() - 30),
-                new Vector2(80, 40),
+                new Vector2(20, windowDimensions.y() - 60),
+                new Vector2(3, 2),
+                UI_GRID_ELEMENT_DIMENSIONS,
                 this,
                 DEFAULT_GAME_COUNT);
-        // Initializing the hearts
+        // Initializing the hearts for the start of the game
         for (int iter = 0; iter < DEFAULT_GAME_COUNT; iter++) {
             userInterface.addHeart(imageReader);
         }
@@ -166,9 +169,9 @@ public class BrickerGameManager extends GameManager {
         // this does not include the walls, since the player cannot reach
         float maxRowLength = windowDimensions.x() - (BRICK_BASE_POSITION.x() * 2);
 
-        BrickGrid brickGrid = new BrickGrid(
+        brickGrid = new BrickGrid(
                 BRICK_BASE_POSITION,
-                new Vector2(brickRowCount, brickCountPerRow),
+                new Vector2(brickCountPerRow, brickRowCount),
                 BRICK_HEIGHT_PIXELS,
                 maxRowLength,
                 this);
@@ -177,10 +180,7 @@ public class BrickerGameManager extends GameManager {
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(
-                        col, row,
-                        brickImage,
-                        new BasicCollisionStrategy(this));
+                brickGrid.addObject(col, row, brickImage, new BasicCollisionStrategy(this, brickGrid));
             }
         }
     }
@@ -199,6 +199,13 @@ public class BrickerGameManager extends GameManager {
             }
 
             if (windowController.openYesNoDialog("You lose! Play again?")) {
+                windowController.resetGame();
+            } else {
+                windowController.closeWindow();
+            }
+        }
+        else if (0 == brickGrid.getBrickCount()) {
+            if (windowController.openYesNoDialog("You win! Play again?")) {
                 windowController.resetGame();
             } else {
                 windowController.closeWindow();

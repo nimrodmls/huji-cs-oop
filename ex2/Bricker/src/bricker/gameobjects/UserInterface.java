@@ -9,14 +9,16 @@ import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
 
 import java.awt.*;
+import java.lang.annotation.ElementType;
 
-public class UserInterface extends GameObject {
+public class UserInterface extends GridGameObject {
     private final float HEART_WIDTH = 20;
     private final float HEART_SPACING = 10;
+    private static final float ELEMENT_SPACING = 10.0f;
 
     private final Vector2 dimensions;
     private final BrickerGameManager gameManager;
-    private final TextRenderable heartCounter;
+    private TextRenderable heartCounter;
     private GameObject[] hearts;
     private int heartCount = 0;
 
@@ -30,40 +32,26 @@ public class UserInterface extends GameObject {
      */
     public UserInterface(Vector2 topLeftCorner,
                          Vector2 dimensions,
+                         Vector2 elementDimensions,
                          BrickerGameManager gameManager,
                          int maxHeartCount) {
-        super(topLeftCorner, dimensions, null);
+        super(topLeftCorner, dimensions, elementDimensions, ELEMENT_SPACING, gameManager);
         this.dimensions = dimensions;
         this.gameManager = gameManager;
         hearts = new GameObject[maxHeartCount];
-        heartCounter = new TextRenderable(Integer.toString(heartCount));
-        heartCounter.setColor(Color.green);
-
-        GameObject heartCounterObject = new GameObject(
-                new Vector2(
-                        getTopLeftCorner().x() - 50,
-                        getTopLeftCorner().y() - 50),
-                new Vector2(30, 30),
-                heartCounter);
-        gameManager.addGameObject(heartCounterObject, Layer.UI);
     }
 
     public void addHeart(ImageReader imageReader) {
+
         if (heartCount >= hearts.length) {
-            return; // Reached capacity of hearts
+            return; // Reached capacity of hearts, ignore
         }
 
         Renderable heartImage = imageReader.readImage(
                 "asserts/heart.png", true);
-        float heart_width = BrickerGameManager.calculateObjectWidthInRow(
-                hearts.length, HEART_SPACING, dimensions.x());
-        hearts[heartCount] = new GameObject(
-                new Vector2(
-                        getTopLeftCorner().x() + (heartCount * (heart_width + HEART_SPACING)),
-                        getTopLeftCorner().y()),
-                new Vector2(heart_width, heart_width),
-                heartImage);
-        gameManager.addGameObject(hearts[heartCount], Layer.UI);
+
+        hearts[heartCount] = new GameObject(getTopLeftCorner(), getDimensions(), heartImage);
+        super.addObject(heartCount, 1, hearts[heartCount], Layer.UI);
         heartCount++;
 
         updateHeartCounter();
@@ -83,6 +71,15 @@ public class UserInterface extends GameObject {
     }
 
     private void updateHeartCounter() {
+        if (null == heartCounter) {
+
+            heartCounter = new TextRenderable(Integer.toString(heartCount));
+            heartCounter.setColor(Color.green);
+
+            GameObject heartCounterObject = new GameObject(getTopLeftCorner(), getDimensions(), heartCounter);
+            super.addObject(0, 0, heartCounterObject, Layer.UI);
+        }
+
         switch (heartCount) {
             case 1:
                 heartCounter.setColor(Color.RED);

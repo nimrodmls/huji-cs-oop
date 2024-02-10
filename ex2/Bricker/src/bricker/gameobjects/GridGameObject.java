@@ -51,7 +51,6 @@ public class GridGameObject extends GameObject {
         object.setTopLeftCorner(initial.add(new Vector2(
                 coordX * (elementDimensions.x() + spacing),
                 coordY * (elementDimensions.y() + spacing))));
-        System.out.println(object.getTopLeftCorner());
         gameManager.addGameObject(object, objectLayer);
     }
 }
