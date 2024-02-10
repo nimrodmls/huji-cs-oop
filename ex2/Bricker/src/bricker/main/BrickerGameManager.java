@@ -1,7 +1,9 @@
 package bricker.main;
 
 import bricker.brick_strategies.BasicCollisionStrategy;
+import bricker.brick_strategies.DoublePaddleStrategy;
 import bricker.brick_strategies.PuckStrategy;
+import bricker.factory.StrategyFactory;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.BrickGrid;
@@ -15,6 +17,7 @@ import danogl.collisions.Layer;
 import danogl.components.CoordinateSpace;
 import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
+import danogl.util.Counter;
 import danogl.util.Vector2;
 
 import java.awt.event.KeyEvent;
@@ -98,7 +101,7 @@ public class BrickerGameManager extends GameManager {
         GameObject userPaddle =
                 new Paddle(
                         Vector2.ZERO,
-                        new Vector2(100, 15),
+                        GameConstants.PADDLE_DIMENSIONS,
                         windowDimensions,
                         paddleImage,
                         inputListener);
@@ -159,6 +162,7 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void createBricks(ImageReader imageReader) {
+        StrategyFactory strategyFactory = new StrategyFactory();
         Renderable brickImage = imageReader.readImage(
                 "asserts/brick.png", false);
 
@@ -174,13 +178,18 @@ public class BrickerGameManager extends GameManager {
                 this);
         gameObjects().addGameObject(brickGrid, Layer.BACKGROUND);
 
+        Counter hitCounter = new Counter();
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new PuckStrategy(this, brickGrid, 2, soundReader, imageReader));
+                brickGrid.addObject(col, row, brickImage, new DoublePaddleStrategy(this, brickGrid, userInputListener, imageReader, windowDimensions, hitCounter));
             }
         }
     }
+
+   /* private Brick createRandomBrick() {
+        Random random = new Random();
+    }*/
 
     @Override
     public void update(float deltaTime) {
