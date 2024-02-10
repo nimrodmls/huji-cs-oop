@@ -32,7 +32,6 @@ public class FallingHeartStrategy extends BasicCollisionStrategy {
 
         FallingHeart fallingHeart = new FallingHeart(object1.getCenter(), heartDimensions, heartImage, paddle, gameManager);
         fallingHeart.setVelocity(HEART_VELOCITY);
-        gameManager.addGameObject(fallingHeart, Layer.DEFAULT
-        );
+        gameManager.addGameObject(fallingHeart, Layer.DEFAULT);
     }
 }
