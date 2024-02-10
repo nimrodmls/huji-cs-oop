@@ -14,6 +14,7 @@ public class DoublePaddle extends Paddle {
     private static final int MAX_HIT_COUNT = 4;
 
     private final BrickerGameManager gameManager;
+    private final Counter paddleCounter;
     private Counter hitCounter;
 
     /**
@@ -32,9 +33,11 @@ public class DoublePaddle extends Paddle {
                         Vector2 windowDimensions,
                         Renderable renderable,
                         UserInputListener inputListener,
+                        Counter paddleCounter,
                         Counter hitCounter,
                         BrickerGameManager gameManager) {
         super(topLeftCorner, dimensions, windowDimensions, renderable, inputListener);
+        this.paddleCounter = paddleCounter;
         this.hitCounter = hitCounter;
         this.gameManager = gameManager;
     }
@@ -43,15 +46,11 @@ public class DoublePaddle extends Paddle {
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
         hitCounter.increment();
-    }
-
-    @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
 
         if (MAX_HIT_COUNT == hitCounter.value()) {
             hitCounter.reset();
-            gameManager.removeGameObject(this, Layer.DEFAULT);
+            paddleCounter.reset();
+            gameManager.removeGameObject(this, Layer.FOREGROUND);
         }
     }
 }

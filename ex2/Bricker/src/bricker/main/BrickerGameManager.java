@@ -108,7 +108,7 @@ public class BrickerGameManager extends GameManager {
         userPaddle.setCenter(
                 new Vector2(windowDimensions.x() / 2, windowDimensions.y() - 40));
 
-        this.gameObjects().addGameObject(userPaddle);
+        this.gameObjects().addGameObject(userPaddle, Layer.FOREGROUND);
 
         // Instantiating the rest of the objects
         createBoardWalls();
@@ -157,7 +157,7 @@ public class BrickerGameManager extends GameManager {
         for (Vector2[] positionPair : wallPositions) {
             GameObject wallObject = new GameObject(
                     positionPair[0], positionPair[1], null);
-            this.gameObjects().addGameObject(wallObject);
+            this.gameObjects().addGameObject(wallObject, Layer.FOREGROUND);
         }
     }
 
@@ -179,10 +179,11 @@ public class BrickerGameManager extends GameManager {
         gameObjects().addGameObject(brickGrid, Layer.BACKGROUND);
 
         Counter hitCounter = new Counter();
+        Counter paddleCounter = new Counter();
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new DoublePaddleStrategy(this, brickGrid, userInputListener, imageReader, windowDimensions, hitCounter));
+                brickGrid.addObject(col, row, brickImage, new DoublePaddleStrategy(this, brickGrid, userInputListener, imageReader, windowDimensions, paddleCounter, hitCounter));
             }
         }
     }
