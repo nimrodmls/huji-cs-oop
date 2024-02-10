@@ -1,9 +1,6 @@
 package bricker.main;
 
-import bricker.brick_strategies.BasicCollisionStrategy;
-import bricker.brick_strategies.CameraStrategy;
-import bricker.brick_strategies.DoublePaddleStrategy;
-import bricker.brick_strategies.PuckStrategy;
+import bricker.brick_strategies.*;
 import bricker.factory.StrategyFactory;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
@@ -18,6 +15,7 @@ import danogl.collisions.Layer;
 import danogl.components.CoordinateSpace;
 import danogl.gui.*;
 import danogl.gui.rendering.Camera;
+import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
@@ -38,6 +36,7 @@ public class BrickerGameManager extends GameManager {
     // Where in the window we start placing bricks
     private static final Vector2 BRICK_BASE_POSITION =
             new Vector2(WALL_WIDTH_PIXELS*2, WALL_WIDTH_PIXELS*2);
+    private static final int MAX_LIFE_COUNT = 4;
 
     private final int brickCountPerRow;
     private final int brickRowCount;
@@ -46,9 +45,11 @@ public class BrickerGameManager extends GameManager {
     private Vector2 windowDimensions;
     private WindowController windowController;
     private int currentGameIndex = 1;
+    private int lifeCounter = DEFAULT_GAME_COUNT;
     private UserInterface userInterface;
     private UserInputListener userInputListener;
-    private SoundReader soundReader;
+    private ImageReader imageReader;
+    private Paddle userPaddle;
 
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
@@ -75,7 +76,7 @@ public class BrickerGameManager extends GameManager {
                 imageReader, soundReader, inputListener, windowController);
         this.windowController = windowController;
         this.userInputListener = inputListener;
-        this.soundReader = soundReader;
+        this.imageReader = imageReader;
         windowDimensions = windowController.getWindowDimensions();
         currentGameIndex = 1; // Restarting the game count
 
@@ -100,7 +101,7 @@ public class BrickerGameManager extends GameManager {
                 "asserts/paddle.png", true);
 
         // Create User Paddle
-        GameObject userPaddle =
+        userPaddle =
                 new Paddle(
                         Vector2.ZERO,
                         GameConstants.PADDLE_DIMENSIONS,
@@ -136,10 +137,10 @@ public class BrickerGameManager extends GameManager {
     private void initiateUI(ImageReader imageReader) {
         userInterface = new UserInterface(
                 new Vector2(20, windowDimensions.y() - 60),
-                new Vector2(3, 2),
+                new Vector2(4, 2),
                 UI_GRID_ELEMENT_DIMENSIONS,
                 this,
-                DEFAULT_GAME_COUNT);
+                MAX_LIFE_COUNT);
         // Initializing the hearts for the start of the game
         for (int iter = 0; iter < DEFAULT_GAME_COUNT; iter++) {
             userInterface.addHeart(imageReader);
@@ -182,17 +183,15 @@ public class BrickerGameManager extends GameManager {
 
         Counter hitCounter = new Counter();
         Counter paddleCounter = new Counter();
+        ImageRenderable heartImage = imageReader.readImage(
+                "asserts/heart.png", true);
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new CameraStrategy(this, brickGrid, ball, windowDimensions, hitCounter));
+                brickGrid.addObject(col, row, brickImage, new FallingHeartStrategy(this, brickGrid, heartImage, UI_GRID_ELEMENT_DIMENSIONS, userPaddle));
             }
         }
     }
-
-   /* private Brick createRandomBrick() {
-        Random random = new Random();
-    }*/
 
     @Override
     public void update(float deltaTime) {
@@ -200,15 +199,29 @@ public class BrickerGameManager extends GameManager {
         endgameHandler();
     }
 
+    public void addLife() {
+        if (lifeCounter < MAX_LIFE_COUNT) {
+            userInterface.addHeart(imageReader);
+            lifeCounter++;
+        }
+    }
+
+    public boolean removeLife() {
+        if (lifeCounter > 0) {
+            userInterface.removeHeart();
+            lifeCounter--;
+        }
+
+        return 0 == lifeCounter;
+    }
+
     private void endgameHandler() {
         String prompt;
         // Losing scenario - Ball left the window (from below)
         if (ball.getCenter().y() > windowDimensions.y()) {
 
-            if (currentGameIndex < DEFAULT_GAME_COUNT) {
-                currentGameIndex++;
+            if (!removeLife()) {
                 restartBall(ball, windowDimensions);
-                userInterface.removeHeart();
                 return;
             }
 
