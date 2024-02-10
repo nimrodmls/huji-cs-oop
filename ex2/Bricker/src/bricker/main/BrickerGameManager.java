@@ -1,6 +1,7 @@
 package bricker.main;
 
 import bricker.brick_strategies.BasicCollisionStrategy;
+import bricker.brick_strategies.CameraStrategy;
 import bricker.brick_strategies.DoublePaddleStrategy;
 import bricker.brick_strategies.PuckStrategy;
 import bricker.factory.StrategyFactory;
@@ -16,6 +17,7 @@ import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.components.CoordinateSpace;
 import danogl.gui.*;
+import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
@@ -183,7 +185,7 @@ public class BrickerGameManager extends GameManager {
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new DoublePaddleStrategy(this, brickGrid, userInputListener, imageReader, windowDimensions, paddleCounter, hitCounter));
+                brickGrid.addObject(col, row, brickImage, new CameraStrategy(this, brickGrid, ball, windowDimensions, hitCounter));
             }
         }
     }
