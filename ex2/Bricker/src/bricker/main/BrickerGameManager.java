@@ -83,15 +83,15 @@ public class BrickerGameManager extends GameManager {
 
         // Creating the Ball
         Renderable ballImage =
-                imageReader.readImage("asserts/ball.png", true);
+                imageReader.readImage("assets/ball.png", true);
         Sound collisionSound = soundReader.readSound(
-                "asserts/blop_cut_silenced.wav");
+                "assets/blop_cut_silenced.wav");
         ball = new Ball(Vector2.ZERO, GameConstants.PRIMARY_BALL_DIMENSIONS, ballImage, collisionSound);
         restartBall(ball, windowDimensions);
         this.gameObjects().addGameObject(ball);
 
         Renderable paddleImage = imageReader.readImage(
-                "asserts/paddle.png", true);
+                "assets/paddle.png", true);
 
         // Create User Paddle
         userPaddle =
@@ -120,7 +120,7 @@ public class BrickerGameManager extends GameManager {
 
     private void addBackground(ImageReader imageReader) {
         Renderable background = imageReader.readImage(
-                "asserts/DARK_BG2_small.jpeg", false);
+                "assets/DARK_BG2_small.jpeg", false);
         GameObject backgroundObject = new GameObject(
                 Vector2.ZERO, windowDimensions, background);
         backgroundObject.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
@@ -159,7 +159,7 @@ public class BrickerGameManager extends GameManager {
 
     private void createBricks(ImageReader imageReader) {
         Renderable brickImage = imageReader.readImage(
-                "asserts/brick.png", false);
+                "assets/brick.png", false);
 
         // Calculating the amount of pixels that the bricks can take up
         // this does not include the walls, since the player cannot reach

@@ -43,7 +43,7 @@ public class UserInterface extends GridGameObject {
         }
 
         Renderable heartImage = imageReader.readImage(
-                "asserts/heart.png", true);
+                "assets/heart.png", true);
 
         hearts[heartCount] = new GameObject(getTopLeftCorner(), getDimensions(), heartImage);
         super.addObject(heartCount, 1, hearts[heartCount], Layer.UI);

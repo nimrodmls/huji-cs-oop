@@ -98,9 +98,9 @@ public class StrategyFactory {
         switch (availableStrategies[chosenStrategy]) {
             case STRATEGY_PUCK:
                 ImageRenderable ballImage =
-                        imageReader.readImage("asserts/mockBall.png", true);
+                        imageReader.readImage("assets/mockBall.png", true);
                 Sound collisionSound = soundReader.readSound(
-                        "asserts/blop_cut_silenced.wav");
+                        "assets/blop_cut_silenced.wav");
                 strategy = new PuckStrategy(
                         gameManager,
                         brickGrid,
@@ -121,7 +121,7 @@ public class StrategyFactory {
 
             case STRATEGY_FALLING_HEART:
                 ImageRenderable heartImage = imageReader.readImage(
-                        "asserts/heart.png", true);
+                        "assets/heart.png", true);
                 strategy = new FallingHeartStrategy(
                         gameManager,
                         brickGrid,
@@ -132,7 +132,7 @@ public class StrategyFactory {
 
             case STRATEGY_DOUBLE_PADDLE:
                 ImageRenderable paddleImage = imageReader.readImage(
-                        "asserts/paddle.png", false);
+                        "assets/paddle.png", false);
                 strategy = new DoublePaddleStrategy(
                         gameManager,
                         brickGrid,
