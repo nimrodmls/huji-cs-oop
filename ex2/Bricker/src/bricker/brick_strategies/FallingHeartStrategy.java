@@ -19,7 +19,7 @@ public class FallingHeartStrategy extends BasicCollisionStrategy {
     private final Paddle paddle;
 
     public FallingHeartStrategy(BrickerGameManager gameManager, BrickGrid brickGrid, ImageRenderable heartImage, Vector2 heartDimensions, Paddle paddle) {
-        super(gameManager, brickGrid);
+        super(brickGrid);
         this.gameManager = gameManager;
         this.heartImage = heartImage;
         this.heartDimensions = heartDimensions;

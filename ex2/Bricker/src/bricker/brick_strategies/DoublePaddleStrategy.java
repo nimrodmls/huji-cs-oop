@@ -28,7 +28,7 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
                                 Vector2 windowDimensions,
                                 Counter paddleCounter,
                                 Counter hitCounter) {
-        super(gameManager, brickGrid);
+        super(brickGrid);
         this.gameManager = gameManager;
         this.inputListener = inputListener;
         this.paddleImage = paddleImage;
@@ -44,8 +44,6 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
         if (0 != paddleCounter.value()) {
             return;
         }
-
-        System.out.println("Creating new: " + hitCounter.value());
 
         GameObject paddle =
                 new DoublePaddle(

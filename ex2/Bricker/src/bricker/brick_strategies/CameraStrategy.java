@@ -23,7 +23,7 @@ public class CameraStrategy extends BasicCollisionStrategy {
                           Ball primaryBall,
                           Vector2 windowDimensions,
                           Counter hitCounter) {
-        super(gameManager, brickGrid);
+        super(brickGrid);
         this.gameManager = gameManager;
         this.primaryBall = primaryBall;
         this.windowDimensions = windowDimensions;

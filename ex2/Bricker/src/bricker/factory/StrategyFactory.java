@@ -9,30 +9,18 @@ import danogl.gui.ImageReader;
 import danogl.gui.Sound;
 import danogl.gui.SoundReader;
 import danogl.gui.UserInputListener;
-import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.ImageRenderable;
-import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 
 import java.util.Random;
 
 enum SpecialStrategy {
-    STRATEGY_PUCK(1),
-    STRATEGY_FALLING_HEART(2),
-    STRATEGY_DOUBLE_PADDLE(3),
-    STRATEGY_CAMERA(4),
-    STRATEGY_DOUBLE_ACTION(5);
-
-    private final int strategyId;
-
-    SpecialStrategy(int strategyId) {
-        this.strategyId = strategyId;
-    }
-
-    public int strategyId() {
-        return strategyId;
-    }
+    STRATEGY_PUCK,
+    STRATEGY_FALLING_HEART,
+    STRATEGY_DOUBLE_PADDLE,
+    STRATEGY_CAMERA,
+    STRATEGY_DOUBLE_ACTION;
 }
 
 public class StrategyFactory {
@@ -85,13 +73,18 @@ public class StrategyFactory {
         Random random = new Random();
         boolean isSpecial = random.nextBoolean();
 
+        // There is a 50-50 chance for either getting the basic behavior or a special behavior
         if (isSpecial) {
+            // We were chosen to create a special strategy
+            // Initializing a counter for the double actions - the code will not create
+            // nested double actions once this counter has reached 0
             Counter allowedDoubleActions = new Counter();
             allowedDoubleActions.increaseBy(ALLOWED_DOUBLE_ACTIONS);
             return createRandomSpecialStrategy(allowedDoubleActions);
 
         } else {
-            return new BasicCollisionStrategy(gameManager, brickGrid);
+            // Creating a regular brick strategy
+            return new BasicCollisionStrategy(brickGrid);
         }
     }
 
@@ -154,7 +147,7 @@ public class StrategyFactory {
                 allowedDoubleActions.decrement();
                 CollisionStrategy strategy1 = createRandomSpecialStrategy(allowedDoubleActions);
                 CollisionStrategy strategy2 = createRandomSpecialStrategy(allowedDoubleActions);
-                strategy = new DoubleActionStrategy(gameManager, brickGrid, strategy1, strategy2);
+                strategy = new DoubleActionStrategy(brickGrid, strategy1, strategy2);
                 break;
 
             default:

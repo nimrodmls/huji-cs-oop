@@ -46,8 +46,9 @@ public class BrickGrid extends GridGameObject {
             return;
         }
 
-        gameManager.removeGameObject(object, BRICKS_LAYER);
-        brickCount--;
+        if (gameManager.removeGameObject(object, BRICKS_LAYER)) {
+            brickCount--;
+        }
     }
 
     public int getBrickCount() {

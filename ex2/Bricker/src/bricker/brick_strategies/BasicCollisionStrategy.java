@@ -8,11 +8,9 @@ import danogl.collisions.Layer;
 
 public class BasicCollisionStrategy implements CollisionStrategy {
 
-    private final BrickerGameManager gameManager;
     private final BrickGrid brickGrid;
 
-    public BasicCollisionStrategy(BrickerGameManager gameManager, BrickGrid brickGrid) {
-        this.gameManager = gameManager;
+    public BasicCollisionStrategy(BrickGrid brickGrid) {
         this.brickGrid = brickGrid;
     }
     

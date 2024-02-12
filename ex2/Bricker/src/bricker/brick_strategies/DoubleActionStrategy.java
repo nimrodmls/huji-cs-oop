@@ -8,8 +8,8 @@ public class DoubleActionStrategy extends BasicCollisionStrategy {
     private final CollisionStrategy strategy1;
     private final CollisionStrategy strategy2;
 
-    public DoubleActionStrategy(BrickerGameManager gameManager, BrickGrid brickGrid, CollisionStrategy strategy1, CollisionStrategy strategy2) {
-        super(gameManager, brickGrid);
+    public DoubleActionStrategy(BrickGrid brickGrid, CollisionStrategy strategy1, CollisionStrategy strategy2) {
+        super(brickGrid);
         this.strategy1 = strategy1;
         this.strategy2 = strategy2;
     }

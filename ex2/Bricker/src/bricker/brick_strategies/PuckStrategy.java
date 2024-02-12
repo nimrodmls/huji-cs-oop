@@ -25,7 +25,7 @@ public class PuckStrategy extends BasicCollisionStrategy {
     private final ImageRenderable ballImage;
 
     public PuckStrategy(BrickerGameManager gameManager, BrickGrid brickGrid, int ballCount, Sound hitSound, ImageRenderable ballImage) {
-        super(gameManager, brickGrid);
+        super(brickGrid);
         this.gameManager = gameManager;
         this.ballCount = ballCount;
         this.hitSound = hitSound;
