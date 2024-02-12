@@ -20,4 +20,13 @@ public class Utils {
         // Setting starting velocity vector & the starting position of the ball
         ball.setVelocity(new Vector2(ballSpeedX, ballSpeedY));
     }
+
+    public static void randomizeAltBallVelocity(Ball ball, float BALL_SPEED) {
+        Random random = new Random();
+        double angle = random.nextDouble() * Math.PI;
+        float velocityX = (float)Math.cos(angle) * BALL_SPEED;
+        float velocityY = (float)Math.sin(angle) * BALL_SPEED;
+
+        ball.setVelocity(new Vector2(velocityX, velocityY));
+    }
 }

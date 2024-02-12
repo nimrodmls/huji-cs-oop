@@ -45,7 +45,7 @@ public class PuckStrategy extends BasicCollisionStrategy {
                     ballImage,
                     hitSound);
             gameManager.addGameObject(ball, Layer.DEFAULT);
-            Utils.randomizeBallVelocity(ball, GameConstants.PRIMARY_BALL_SPEED);
+            Utils.randomizeAltBallVelocity(ball, GameConstants.PRIMARY_BALL_SPEED);
         }
     }
 }
