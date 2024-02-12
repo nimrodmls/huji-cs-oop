@@ -44,11 +44,11 @@ public class BrickerGameManager extends GameManager {
     private BrickGrid brickGrid;
     private Vector2 windowDimensions;
     private WindowController windowController;
-    private int currentGameIndex = 1;
-    private int lifeCounter = DEFAULT_GAME_COUNT;
+    private int lifeCounter;
     private UserInterface userInterface;
     private UserInputListener userInputListener;
     private ImageReader imageReader;
+    private SoundReader soundReader;
     private Paddle userPaddle;
 
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
@@ -74,11 +74,11 @@ public class BrickerGameManager extends GameManager {
 
         super.initializeGame(
                 imageReader, soundReader, inputListener, windowController);
+        this.imageReader = imageReader;
+        this.soundReader = soundReader;
         this.windowController = windowController;
         this.userInputListener = inputListener;
-        this.imageReader = imageReader;
         windowDimensions = windowController.getWindowDimensions();
-        currentGameIndex = 1; // Restarting the game count
 
         // Collision rules in the foreground should not exist (interaction between bricks etc.)
         gameObjects().layers().shouldLayersCollide(
@@ -143,7 +143,7 @@ public class BrickerGameManager extends GameManager {
                 MAX_LIFE_COUNT);
         // Initializing the hearts for the start of the game
         for (int iter = 0; iter < DEFAULT_GAME_COUNT; iter++) {
-            userInterface.addHeart(imageReader);
+            addLife();
         }
     }
 
@@ -165,7 +165,6 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void createBricks(ImageReader imageReader) {
-        StrategyFactory strategyFactory = new StrategyFactory();
         Renderable brickImage = imageReader.readImage(
                 "asserts/brick.png", false);
 
@@ -181,14 +180,23 @@ public class BrickerGameManager extends GameManager {
                 this);
         gameObjects().addGameObject(brickGrid, Layer.BACKGROUND);
 
-        Counter hitCounter = new Counter();
-        Counter paddleCounter = new Counter();
-        ImageRenderable heartImage = imageReader.readImage(
-                "asserts/heart.png", true);
+        StrategyFactory strategyFactory = new StrategyFactory(
+                this,
+                brickGrid,
+                imageReader,
+                soundReader,
+                userInputListener,
+                windowDimensions,
+                UI_GRID_ELEMENT_DIMENSIONS,
+                ball,
+                userPaddle,
+                GameConstants.PUCK_BALL_COUNT
+        );
+
         // Creating the bricks, row after row
         for (int row = 0; row < brickRowCount; row++) {
             for (int col = 0; col < brickCountPerRow; col++) {
-                brickGrid.addObject(col, row, brickImage, new FallingHeartStrategy(this, brickGrid, heartImage, UI_GRID_ELEMENT_DIMENSIONS, userPaddle));
+                brickGrid.addObject(col, row, brickImage, strategyFactory.createRandomStrategy());
             }
         }
     }

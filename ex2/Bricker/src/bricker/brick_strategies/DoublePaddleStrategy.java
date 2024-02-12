@@ -2,23 +2,21 @@ package bricker.brick_strategies;
 
 import bricker.gameobjects.BrickGrid;
 import bricker.gameobjects.DoublePaddle;
-import bricker.gameobjects.UserInterface;
 import bricker.main.BrickerGameManager;
 import bricker.utilities.GameConstants;
 import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
+import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 
-import java.awt.event.InputMethodListener;
-
 public class DoublePaddleStrategy extends BasicCollisionStrategy {
     private final BrickerGameManager gameManager;
     private final UserInputListener inputListener;
-    private final ImageReader imageReader;
+    private final ImageRenderable paddleImage;
     private final Vector2 windowDimensions;
     private final Counter paddleCounter;
     private final Counter hitCounter;
@@ -26,14 +24,14 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
     public DoublePaddleStrategy(BrickerGameManager gameManager,
                                 BrickGrid brickGrid,
                                 UserInputListener inputListener,
-                                ImageReader imageReader,
+                                ImageRenderable paddleImage,
                                 Vector2 windowDimensions,
                                 Counter paddleCounter,
                                 Counter hitCounter) {
         super(gameManager, brickGrid);
         this.gameManager = gameManager;
         this.inputListener = inputListener;
-        this.imageReader = imageReader;
+        this.paddleImage = paddleImage;
         this.windowDimensions = windowDimensions;
         this.paddleCounter = paddleCounter;
         this.hitCounter = hitCounter;
@@ -49,8 +47,6 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
 
         System.out.println("Creating new: " + hitCounter.value());
 
-        Renderable paddleImage = imageReader.readImage(
-                "asserts/paddle.png", true);
         GameObject paddle =
                 new DoublePaddle(
                         Vector2.ZERO,
