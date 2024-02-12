@@ -1,9 +1,7 @@
 package bricker.main;
 
-import bricker.brick_strategies.*;
 import bricker.factory.StrategyFactory;
 import bricker.gameobjects.Ball;
-import bricker.gameobjects.Brick;
 import bricker.gameobjects.BrickGrid;
 import bricker.gameobjects.Paddle;
 import bricker.gameobjects.UserInterface;
@@ -14,20 +12,15 @@ import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.components.CoordinateSpace;
 import danogl.gui.*;
-import danogl.gui.rendering.Camera;
-import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
-import danogl.util.Counter;
 import danogl.util.Vector2;
 
 import java.awt.event.KeyEvent;
-import java.util.Random;
 
 public class BrickerGameManager extends GameManager {
 
     private static final Vector2 UI_GRID_ELEMENT_DIMENSIONS = new Vector2(20, 20);
     private static final int DEFAULT_GAME_COUNT = 3;
-    private static final int BRICK_DISTANCING_PIXELS = 3;
     private static final int BRICK_HEIGHT_PIXELS = 15;
     private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
     private static final int DEFAULT_BRICK_ROW_COUNT = 7;

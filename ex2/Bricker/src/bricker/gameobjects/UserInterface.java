@@ -9,14 +9,10 @@ import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
 
 import java.awt.*;
-import java.lang.annotation.ElementType;
 
 public class UserInterface extends GridGameObject {
-    private final float HEART_WIDTH = 20;
-    private final float HEART_SPACING = 10;
     private static final float ELEMENT_SPACING = 10.0f;
 
-    private final Vector2 dimensions;
     private final BrickerGameManager gameManager;
     private TextRenderable heartCounter;
     private GameObject[] hearts;
@@ -36,7 +32,6 @@ public class UserInterface extends GridGameObject {
                          BrickerGameManager gameManager,
                          int maxHeartCount) {
         super(topLeftCorner, dimensions, elementDimensions, ELEMENT_SPACING, gameManager);
-        this.dimensions = dimensions;
         this.gameManager = gameManager;
         hearts = new GameObject[maxHeartCount];
     }

@@ -1,17 +1,13 @@
 package bricker.gameobjects;
 
 import bricker.main.BrickerGameManager;
-import danogl.GameManager;
 import danogl.GameObject;
-import danogl.gui.rendering.RectangleRenderable;
-import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
 import java.awt.*;
 
 public class GridGameObject extends GameObject {
     
-    private final Vector2 dimensions;
     private final Vector2 elementDimensions;
     private final float spacing;
     private final BrickerGameManager gameManager;
@@ -34,7 +30,6 @@ public class GridGameObject extends GameObject {
                     dimensions.x() * (elementDimensions.x() + spacing),
                     dimensions.y() * (elementDimensions.y() + spacing)),
                 null);
-        this.dimensions = dimensions;
         this.elementDimensions = elementDimensions;
         this.spacing = spacing;
         this.gameManager = gameManager;
