@@ -17,7 +17,7 @@ public class BasicCollisionStrategy implements CollisionStrategy {
 
     /**
      * Constructs a BasicCollisionStrategy with the specified brick grid.
-     * The strategy assumes that all colided bricks belong to the given grid.
+     * The strategy assumes that all collided bricks belong to the given grid.
      * 
      * @param brickGrid the brick grid to be used for collision handling
      */

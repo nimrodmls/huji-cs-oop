@@ -41,8 +41,6 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
      * @param inputListener    the user input listener for the Bricker game
      * @param paddleImage      the image renderable for the paddle
      * @param windowDimensions the dimensions of the game window
-     * @param paddleCounter    the counter for the number of paddles
-     * @param hitCounter       the counter for the number of hits
      */
     public DoublePaddleStrategy(BrickerGameManager gameManager,
                                 BrickGrid brickGrid,
