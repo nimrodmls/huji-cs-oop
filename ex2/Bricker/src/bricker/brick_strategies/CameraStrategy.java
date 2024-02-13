@@ -2,21 +2,18 @@ package bricker.brick_strategies;
 
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.BrickGrid;
+import bricker.gameobjects.CameraController;
 import bricker.main.BrickerGameManager;
 import danogl.GameObject;
+import danogl.collisions.Layer;
 import danogl.gui.rendering.Camera;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 
 public class CameraStrategy extends BasicCollisionStrategy {
-    /* Number of hits required for the camera to reset to default position.
-       This number INCLUDES the first hit, which triggers the camera to move. */
-    private static final int MAX_BRICKS_HIT_COUNT = 5;
-
     private final BrickerGameManager gameManager;
     private final Ball primaryBall;
     private final Vector2 windowDimensions;
-    private final Counter hitCounter;
 
     public CameraStrategy(BrickerGameManager gameManager,
                           BrickGrid brickGrid,
@@ -27,7 +24,6 @@ public class CameraStrategy extends BasicCollisionStrategy {
         this.gameManager = gameManager;
         this.primaryBall = primaryBall;
         this.windowDimensions = windowDimensions;
-        this.hitCounter = hitCounter;
     }
 
     @Override
@@ -39,18 +35,24 @@ public class CameraStrategy extends BasicCollisionStrategy {
             return;
         }
 
-        // We reach here if the camera is at its default position
-        if (0 == hitCounter.value()) {
+        // The camera is at a default position - it should be altered
+        if (null == gameManager.camera()) {
             gameManager.setCamera(
-                    new Camera(primaryBall, Vector2.ZERO, windowDimensions.mult(1.2f), windowDimensions));
-        }
-
-        hitCounter.increment();
-
-        // If all the bricks were hit, and the camera should be reset
-        if (MAX_BRICKS_HIT_COUNT == hitCounter.value()) {
-            gameManager.setCamera(null);
-            hitCounter.reset();
+                    new Camera(
+                            primaryBall,
+                            Vector2.ZERO,
+                            windowDimensions.mult(1.2f),
+                            windowDimensions));
+            // Adding the camera controller, which takes responsibility on the camera
+            // according to other events in the game
+            gameManager.addGameObject(
+                    new CameraController(
+                        Vector2.ZERO,
+                        Vector2.ZERO,
+                        null,
+                        gameManager,
+                        primaryBall),
+                    Layer.BACKGROUND);
         }
     }
 }

@@ -15,14 +15,6 @@ import danogl.util.Vector2;
 
 import java.util.Random;
 
-enum SpecialStrategy {
-    STRATEGY_PUCK,
-    STRATEGY_FALLING_HEART,
-    STRATEGY_DOUBLE_PADDLE,
-    STRATEGY_CAMERA,
-    STRATEGY_DOUBLE_ACTION;
-}
-
 public class StrategyFactory {
 
     private static final int ALLOWED_DOUBLE_ACTIONS = 2;
@@ -89,7 +81,7 @@ public class StrategyFactory {
     }
 
     public CollisionStrategy createRandomSpecialStrategy(Counter allowedDoubleActions) {
-        SpecialStrategy[] availableStrategies = getSpecialStrategies(allowedDoubleActions);
+        SpecialStrategies[] availableStrategies = getSpecialStrategies(allowedDoubleActions);
 
         Random random = new Random();
         int chosenStrategy = random.nextInt(availableStrategies.length);
@@ -158,17 +150,17 @@ public class StrategyFactory {
         return strategy;
     }
 
-    private static SpecialStrategy[] getSpecialStrategies(Counter allowedDoubleActions) {
-        SpecialStrategy[] availableStrategies = SpecialStrategy.values();
+    private static SpecialStrategies[] getSpecialStrategies(Counter allowedDoubleActions) {
+        SpecialStrategies[] availableStrategies = SpecialStrategies.values();
 
         // If double actions are not allowed, we don't let it get generated randomly,
         // therefore selecting from all the other strategies
         if (0 == allowedDoubleActions.value()) {
-            availableStrategies = new SpecialStrategy[] {
-                SpecialStrategy.STRATEGY_PUCK,
-                SpecialStrategy.STRATEGY_FALLING_HEART,
-                SpecialStrategy.STRATEGY_DOUBLE_PADDLE,
-                SpecialStrategy.STRATEGY_CAMERA
+            availableStrategies = new SpecialStrategies[] {
+                SpecialStrategies.STRATEGY_PUCK,
+                SpecialStrategies.STRATEGY_FALLING_HEART,
+                SpecialStrategies.STRATEGY_DOUBLE_PADDLE,
+                SpecialStrategies.STRATEGY_CAMERA
             };
         }
         return availableStrategies;
