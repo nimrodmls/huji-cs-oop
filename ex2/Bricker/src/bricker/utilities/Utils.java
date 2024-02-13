@@ -7,8 +7,14 @@ import java.util.Random;
 
 /**
  * A collection of utility methods for the game.
+ * @author Nimrod M.
  */
 public class Utils {
+
+    /**
+     * Private constructor to prevent instantiation. This class is a utility class.
+     */
+    private Utils() {}
 
     /**
      * Randomizes the velocity vector of the ball, with a constant speed.

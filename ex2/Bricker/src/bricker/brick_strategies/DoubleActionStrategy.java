@@ -21,7 +21,8 @@ public class DoubleActionStrategy extends BasicCollisionStrategy {
      * @param strategy1   the first collision strategy to execute
      * @param strategy2   the second collision strategy to execute
      */
-    public DoubleActionStrategy(BrickGrid brickGrid, CollisionStrategy strategy1, CollisionStrategy strategy2) {
+    public DoubleActionStrategy(
+            BrickGrid brickGrid, CollisionStrategy strategy1, CollisionStrategy strategy2) {
         super(brickGrid);
         this.strategy1 = strategy1;
         this.strategy2 = strategy2;

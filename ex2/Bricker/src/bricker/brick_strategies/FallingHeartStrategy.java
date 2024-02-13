@@ -34,7 +34,11 @@ public class FallingHeartStrategy extends BasicCollisionStrategy {
      * @param heartDimensions   the dimensions of the heart to render
      * @param paddle            the paddle, used to detect collisions with the heart
      */
-    public FallingHeartStrategy(BrickerGameManager gameManager, BrickGrid brickGrid, ImageRenderable heartImage, Vector2 heartDimensions, Paddle paddle) {
+    public FallingHeartStrategy(BrickerGameManager gameManager,
+                                BrickGrid brickGrid,
+                                ImageRenderable heartImage,
+                                Vector2 heartDimensions,
+                                Paddle paddle) {
         super(brickGrid);
         this.gameManager = gameManager;
         this.heartImage = heartImage;
@@ -53,7 +57,8 @@ public class FallingHeartStrategy extends BasicCollisionStrategy {
     public void onCollision(GameObject object1, GameObject object2) {
         super.onCollision(object1, object2);
 
-        FallingHeart fallingHeart = new FallingHeart(object1.getCenter(), heartDimensions, heartImage, paddle, gameManager);
+        FallingHeart fallingHeart = new FallingHeart(
+                object1.getCenter(), heartDimensions, heartImage, paddle, gameManager);
         fallingHeart.setVelocity(HEART_VELOCITY);
         gameManager.addGameObject(fallingHeart, Layer.DEFAULT);
     }

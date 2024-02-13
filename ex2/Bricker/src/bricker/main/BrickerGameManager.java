@@ -18,6 +18,10 @@ import bricker.gameobjects.UserInterface;
 import bricker.utilities.GameConstants;
 import bricker.utilities.Utils;
 
+/**
+ * The main game manager for the Bricker game.
+ * @author Nimrod M.
+ */
 public class BrickerGameManager extends GameManager {
 
     private static final int BRICK_HEIGHT_PIXELS = 15;

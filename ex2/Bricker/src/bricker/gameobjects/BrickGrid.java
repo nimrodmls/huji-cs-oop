@@ -30,7 +30,11 @@ public class BrickGrid extends GridGameObject {
      * @param brickHeight       Height of each brick in pixels.
      * @param gameManager       The game manager that will manage this object.
      */
-    public BrickGrid(Vector2 topLeftCorner, Vector2 dimensions, float brickHeight, float totalLength, BrickerGameManager gameManager) {
+    public BrickGrid(Vector2 topLeftCorner,
+                     Vector2 dimensions,
+                     float brickHeight,
+                     float totalLength,
+                     BrickerGameManager gameManager) {
         // The width of each brick is calculated according to the total length of the row
         super(topLeftCorner, dimensions,
               new Vector2(calculateObjectWidth(dimensions.x(), totalLength), brickHeight),
