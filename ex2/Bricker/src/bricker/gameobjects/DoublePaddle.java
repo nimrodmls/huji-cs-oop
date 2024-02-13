@@ -1,6 +1,5 @@
 package bricker.gameobjects;
 
-import bricker.main.BrickerGameManager;
 import danogl.GameObject;
 import danogl.collisions.Collision;
 import danogl.collisions.Layer;
@@ -9,8 +8,15 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 
+import bricker.main.BrickerGameManager;
+
+/**
+ * The class represents a secondary paddle, additional to the primary paddle.
+ * @author Nimrod M.
+ */
 public class DoublePaddle extends Paddle {
 
+    // The maximum hit count the paddle can take before it is removed from the game
     private static final int MAX_HIT_COUNT = 4;
 
     private final BrickerGameManager gameManager;
@@ -27,6 +33,9 @@ public class DoublePaddle extends Paddle {
      * @param renderable       The renderable representing the object. Can be null, in which case
      *                         the GameObject will not be rendered.
      * @param inputListener    Receiving the input from the user, to control the Paddle.
+     * @param paddleCounter    The counter that keeps track of the number of secondary paddles in the game.
+     * @param hitCounter       The counter that keeps track of the number of hits the paddle has taken.
+     * @param gameManager      The game manager responsible for this object.
      */
     public DoublePaddle(Vector2 topLeftCorner,
                         Vector2 dimensions,
@@ -42,6 +51,13 @@ public class DoublePaddle extends Paddle {
         this.gameManager = gameManager;
     }
 
+    /**
+     * Called upon collision of the paddle with any other object.
+     * Keeps track on the hits.
+     *
+     * @param other     The GameObject with which a collision occurred.
+     * @param collision Information regarding this collision.
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);

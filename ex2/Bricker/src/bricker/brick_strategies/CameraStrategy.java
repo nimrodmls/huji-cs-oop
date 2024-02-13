@@ -16,11 +16,6 @@ import bricker.main.BrickerGameManager;
  * with this strategy assigned.
  * @author Nimrod M.
  */
-/**
- * The CameraStrategy class represents a strategy for handling collisions with bricks.
- * It extends the BasicCollisionStrategy class and provides additional functionality
- * for managing the camera position and behavior in the game.
- */
 public class CameraStrategy extends BasicCollisionStrategy {
     private final BrickerGameManager gameManager;
     private final Ball primaryBall;

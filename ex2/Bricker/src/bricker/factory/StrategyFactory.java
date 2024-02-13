@@ -1,11 +1,7 @@
 package bricker.factory;
 
-import bricker.brick_strategies.*;
-import bricker.gameobjects.Ball;
-import bricker.gameobjects.BrickGrid;
-import bricker.gameobjects.Paddle;
-import bricker.main.BrickerGameManager;
-import bricker.utilities.GameConstants;
+import java.util.Random;
+
 import danogl.gui.ImageReader;
 import danogl.gui.Sound;
 import danogl.gui.SoundReader;
@@ -14,37 +10,45 @@ import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 
-import java.util.Random;
+import bricker.brick_strategies.*;
+import bricker.gameobjects.Ball;
+import bricker.gameobjects.BrickGrid;
+import bricker.gameobjects.Paddle;
+import bricker.main.BrickerGameManager;
+import bricker.utilities.GameConstants;
 
+/**
+ * A factory class for creating collision strategies for the bricks in the game.
+ * @author Nimrod M.
+ */
 public class StrategyFactory {
-
-    private static final int ALLOWED_DOUBLE_ACTIONS = 2;
-
     private final BrickerGameManager gameManager;
     private final BrickGrid brickGrid;
     private final ImageReader imageReader;
     private final SoundReader soundReader;
     private final UserInputListener inputListener;
     private final Vector2 windowDimensions;
-    private final Vector2 fallingHeartDimensions;
     private final Ball primaryBall;
     private final Paddle primaryPaddle;
-    private final int puckBallCount;
 
-    private final Counter doublePaddleCounter;
-    private final Counter doublePaddleHitCounter;
-    private final Counter cameraHitCounter;
-
+    /**
+     * @param gameManager       the responsible game manager
+     * @param brickGrid         the brick grid for the bricks
+     * @param imageReader       an image reader
+     * @param soundReader       a sound reader
+     * @param inputListener     a user input listener
+     * @param windowDimensions  the dimensions of the game window
+     * @param primaryBall       the primary ball in the game
+     * @param primaryPaddle     the primary (user's) paddle in the game
+     */
     public StrategyFactory(BrickerGameManager gameManager,
                            BrickGrid brickGrid,
                            ImageReader imageReader,
                            SoundReader soundReader,
                            UserInputListener inputListener,
                            Vector2 windowDimensions,
-                           Vector2 fallingHeartDimensions,
                            Ball primaryBall,
-                           Paddle primaryPaddle,
-                           int PuckBallCount) {
+                           Paddle primaryPaddle) {
 
         this.gameManager = gameManager;
         this.brickGrid = brickGrid;
@@ -52,27 +56,28 @@ public class StrategyFactory {
         this.soundReader = soundReader;
         this.inputListener = inputListener;
         this.windowDimensions = windowDimensions;
-        this.fallingHeartDimensions = fallingHeartDimensions;
         this.primaryBall = primaryBall;
         this.primaryPaddle = primaryPaddle;
-        puckBallCount = PuckBallCount;
-
-        doublePaddleCounter = new Counter();
-        doublePaddleHitCounter = new Counter();
-        cameraHitCounter = new Counter();
     }
 
+    /**
+     * Creates a new collision strategy for a brick.
+     * This strategy is created randomly, with 50-50 chance of it being special, or regular.
+     * When special is chosen, a special strategy is chosen randomly in a uniform manner.
+     *
+     * @return a new collision strategy for a brick
+     */
     public CollisionStrategy createRandomStrategy() {
         Random random = new Random();
         boolean isSpecial = random.nextBoolean();
 
-        // There is a 50-50 chance for either getting the basic behavior or a special behavior
         if (isSpecial) {
             // We were chosen to create a special strategy
+
             // Initializing a counter for the double actions - the code will not create
             // nested double actions once this counter has reached 0
             Counter allowedDoubleActions = new Counter();
-            allowedDoubleActions.increaseBy(ALLOWED_DOUBLE_ACTIONS);
+            allowedDoubleActions.increaseBy(GameConstants.ALLOWED_DOUBLE_ACTIONS);
             return createRandomSpecialStrategy(allowedDoubleActions);
 
         } else {
@@ -81,6 +86,13 @@ public class StrategyFactory {
         }
     }
 
+    /**
+     * Creates a new <b>special collision</b> strategy for a brick.
+     * It is chosen randomly, in a uniform manner.
+     *
+     * @param allowedDoubleActions specifies how many double actions are allowed to be created
+     * @return the new special collision strategy
+     */
     public CollisionStrategy createRandomSpecialStrategy(Counter allowedDoubleActions) {
         SpecialStrategies[] availableStrategies = getSpecialStrategies(allowedDoubleActions);
 
@@ -97,7 +109,7 @@ public class StrategyFactory {
                 strategy = new PuckStrategy(
                         gameManager,
                         brickGrid,
-                        puckBallCount,
+                        GameConstants.PUCK_BALL_COUNT,
                         collisionSound,
                         ballImage
                 );
@@ -118,7 +130,7 @@ public class StrategyFactory {
                         gameManager,
                         brickGrid,
                         heartImage,
-                        fallingHeartDimensions,
+                        GameConstants.FALLING_HEART_DIMENSIONS,
                         primaryPaddle);
                 break;
 
@@ -148,6 +160,13 @@ public class StrategyFactory {
         return strategy;
     }
 
+    /**
+     * Returns an array of allowed special strategies.
+     *
+     * @param allowedDoubleActions the counter for the number of double actions allowed,
+     *                             if this is 0, then the double action strategy will not be allowed
+     * @return an array of allowed special strategy IDs
+     */
     private static SpecialStrategies[] getSpecialStrategies(Counter allowedDoubleActions) {
         SpecialStrategies[] availableStrategies = SpecialStrategies.values();
 

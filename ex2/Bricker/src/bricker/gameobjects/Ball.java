@@ -8,6 +8,7 @@ import danogl.util.Vector2;
 
 /**
  * Represents a ball game object that can collide with other game objects.
+ * @author Nimrod M.
  */
 public class Ball extends GameObject {
 
@@ -31,7 +32,6 @@ public class Ball extends GameObject {
 
     /**
      * Called when the ball collides with another game object.
-     * Updates the ball's velocity, plays the collision sound, and increments the collision counter.
      *
      * @param other     The game object that the ball collided with.
      * @param collision The collision information.

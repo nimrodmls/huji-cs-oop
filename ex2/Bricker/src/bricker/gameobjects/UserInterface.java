@@ -1,5 +1,7 @@
 package bricker.gameobjects;
 
+import java.awt.*;
+
 import bricker.main.BrickerGameManager;
 import bricker.utilities.GameConstants;
 import danogl.GameObject;
@@ -9,8 +11,11 @@ import danogl.gui.rendering.Renderable;
 import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
 
-import java.awt.*;
-
+/**
+ * Represents the UI of the game, including the hearts counter and the hearts themselves.
+ * The UI is a grid.
+ * @author Nimrod M.
+ */
 public class UserInterface extends GridGameObject {
     private static final float ELEMENT_SPACING = 10.0f;
 
@@ -37,6 +42,10 @@ public class UserInterface extends GridGameObject {
         hearts = new GameObject[maxHeartCount];
     }
 
+    /**
+     * Adding a heart to the UI. The heart will be added to the next available slot.
+     * @param imageReader   image reader, to read the heart image with
+     */
     public void addHeart(ImageReader imageReader) {
 
         if (heartCount >= hearts.length) {
@@ -53,6 +62,9 @@ public class UserInterface extends GridGameObject {
         updateHeartCounter();
     }
 
+    /**
+     * Removing a heart from the UI. The heart will be removed from the last slot.
+     */
     public void removeHeart() {
         if (heartCount <= 0) {
             return; // No hearts to remove
@@ -66,6 +78,9 @@ public class UserInterface extends GridGameObject {
         updateHeartCounter();
     }
 
+    /**
+     * Updates the heart counter to reflect the current amount of hearts.
+     */
     private void updateHeartCounter() {
         if (null == heartCounter) {
 
@@ -76,6 +91,7 @@ public class UserInterface extends GridGameObject {
             super.addObject(0, 0, heartCounterObject, Layer.UI);
         }
 
+        // Based on the count of hearts, we set the color of the text
         switch (heartCount) {
             case 1:
                 heartCounter.setColor(Color.RED);

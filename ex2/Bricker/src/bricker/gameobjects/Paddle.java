@@ -1,21 +1,26 @@
 package bricker.gameobjects;
 
+import java.awt.event.KeyEvent;
+
 import danogl.GameObject;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
-import java.awt.event.KeyEvent;
+import bricker.utilities.GameConstants;
 
+/**
+ * Represents a paddle game object that can be controlled by the user.
+ * @author Nimrod M.
+ */
 public class Paddle extends GameObject {
 
-    private static final float MOVEMENT_SPEED = 300.0f;
     private static final float BORDER_FIX_THRESHOLD = 10.0f;
     private final Vector2 boardLength;
     private final UserInputListener inputListener;
 
     /**
-     * Construct a new GameObject instance.
+     * Construct a new paddle controlled by the user.
      *
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
@@ -34,10 +39,21 @@ public class Paddle extends GameObject {
         this.inputListener = inputListener;
     }
 
+    /**
+     * Updates the paddle's position based on the user's input.
+     *
+     * @param deltaTime The time elapsed, in seconds, since the last frame. Can
+     *                  be used to determine a new position/velocity by multiplying
+     *                  this delta with the velocity/acceleration respectively
+     *                  and adding to the position/velocity:
+     *                  velocity += deltaTime*acceleration
+     *                  pos += deltaTime*velocity
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        // Receiving input from the user
         Vector2 movementDirection = Vector2.ZERO;
         if (inputListener.isKeyPressed(KeyEvent.VK_LEFT)) {
             movementDirection = movementDirection.add(Vector2.LEFT);
@@ -45,6 +61,8 @@ public class Paddle extends GameObject {
             movementDirection = movementDirection.add(Vector2.RIGHT);
         }
 
+        // Validating position on the board, to make sure the paddle does not go out of bounds
+        // We add a small threshold for the assumed walls
         Vector2 currentPos = getTopLeftCorner();
         if (currentPos.x() < 0) {
             setTopLeftCorner(currentPos.add(new Vector2(BORDER_FIX_THRESHOLD, 0)));
@@ -54,6 +72,6 @@ public class Paddle extends GameObject {
             movementDirection = Vector2.ZERO;
         }
 
-        setVelocity(movementDirection.mult(MOVEMENT_SPEED));
+        setVelocity(movementDirection.mult(GameConstants.PADDLE_MOVEMENT_SPEED));
     }
 }

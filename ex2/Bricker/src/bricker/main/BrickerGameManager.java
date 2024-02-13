@@ -19,7 +19,6 @@ import java.awt.event.KeyEvent;
 
 public class BrickerGameManager extends GameManager {
 
-    private static final Vector2 UI_GRID_ELEMENT_DIMENSIONS = new Vector2(20, 20);
     private static final int DEFAULT_GAME_COUNT = 3;
     private static final int BRICK_HEIGHT_PIXELS = 15;
     private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
@@ -138,7 +137,7 @@ public class BrickerGameManager extends GameManager {
         userInterface = new UserInterface(
                 new Vector2(20, windowDimensions.y() - 60),
                 new Vector2(4, 2),
-                UI_GRID_ELEMENT_DIMENSIONS,
+                GameConstants.UI_GRID_ELEMENT_DIMENSIONS,
                 this,
                 MAX_LIFE_COUNT);
         // Initializing the hearts for the start of the game
@@ -187,10 +186,8 @@ public class BrickerGameManager extends GameManager {
                 soundReader,
                 userInputListener,
                 windowDimensions,
-                UI_GRID_ELEMENT_DIMENSIONS,
                 ball,
-                userPaddle,
-                GameConstants.PUCK_BALL_COUNT
+                userPaddle
         );
 
         // Creating the bricks, row after row
