@@ -1,6 +1,7 @@
 package bricker.gameobjects;
 
 import bricker.main.BrickerGameManager;
+import bricker.utilities.GameConstants;
 import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.gui.ImageReader;
@@ -43,7 +44,7 @@ public class UserInterface extends GridGameObject {
         }
 
         Renderable heartImage = imageReader.readImage(
-                "assets/heart.png", true);
+                GameConstants.HEART_ASSET_PATH, true);
 
         hearts[heartCount] = new GameObject(getTopLeftCorner(), getDimensions(), heartImage);
         super.addObject(heartCount, 1, hearts[heartCount], Layer.UI);

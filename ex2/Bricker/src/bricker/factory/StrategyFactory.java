@@ -5,6 +5,7 @@ import bricker.gameobjects.Ball;
 import bricker.gameobjects.BrickGrid;
 import bricker.gameobjects.Paddle;
 import bricker.main.BrickerGameManager;
+import bricker.utilities.GameConstants;
 import danogl.gui.ImageReader;
 import danogl.gui.Sound;
 import danogl.gui.SoundReader;
@@ -90,9 +91,9 @@ public class StrategyFactory {
         switch (availableStrategies[chosenStrategy]) {
             case STRATEGY_PUCK:
                 ImageRenderable ballImage =
-                        imageReader.readImage("assets/mockBall.png", true);
+                        imageReader.readImage(GameConstants.PUCK_BALL_ASSET_PATH, true);
                 Sound collisionSound = soundReader.readSound(
-                        "assets/blop_cut_silenced.wav");
+                        GameConstants.COLLISION_SOUND_PATH);
                 strategy = new PuckStrategy(
                         gameManager,
                         brickGrid,
@@ -107,13 +108,12 @@ public class StrategyFactory {
                         gameManager,
                         brickGrid,
                         primaryBall,
-                        windowDimensions,
-                        cameraHitCounter);
+                        windowDimensions);
                 break;
 
             case STRATEGY_FALLING_HEART:
                 ImageRenderable heartImage = imageReader.readImage(
-                        "assets/heart.png", true);
+                        GameConstants.HEART_ASSET_PATH, true);
                 strategy = new FallingHeartStrategy(
                         gameManager,
                         brickGrid,
@@ -124,15 +124,13 @@ public class StrategyFactory {
 
             case STRATEGY_DOUBLE_PADDLE:
                 ImageRenderable paddleImage = imageReader.readImage(
-                        "assets/paddle.png", false);
+                        GameConstants.PADDLE_ASSET_PATH, false);
                 strategy = new DoublePaddleStrategy(
                         gameManager,
                         brickGrid,
                         inputListener,
                         paddleImage,
-                        windowDimensions,
-                        doublePaddleCounter,
-                        doublePaddleHitCounter);
+                        windowDimensions);
                 break;
 
             case STRATEGY_DOUBLE_ACTION:
@@ -163,6 +161,7 @@ public class StrategyFactory {
                 SpecialStrategies.STRATEGY_CAMERA
             };
         }
+
         return availableStrategies;
     }
 }

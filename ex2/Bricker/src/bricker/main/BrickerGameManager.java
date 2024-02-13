@@ -25,7 +25,6 @@ public class BrickerGameManager extends GameManager {
     private static final int DEFAULT_BRICK_COUNT_PER_ROW = 8;
     private static final int DEFAULT_BRICK_ROW_COUNT = 7;
     private static final float WALL_WIDTH_PIXELS = 10.0f;
-    private static final float BALL_SPEED = 200.0f;
     // Where in the window we start placing bricks
     private static final Vector2 BRICK_BASE_POSITION =
             new Vector2(WALL_WIDTH_PIXELS*2, WALL_WIDTH_PIXELS*2);
@@ -44,6 +43,14 @@ public class BrickerGameManager extends GameManager {
     private SoundReader soundReader;
     private Paddle userPaddle;
 
+    /**
+     * Construct a new GameManager instance.
+     *
+     * @param title            The title of the game window.
+     * @param windowSize       The size of the game window.
+     * @param brickCountPerRow The number of bricks in a row.
+     * @param brickRowCount    The number of rows of bricks.
+     */
     public BrickerGameManager(String title, Vector2 windowSize, int brickCountPerRow, int brickRowCount) {
         super(title, windowSize);
         this.brickCountPerRow = brickCountPerRow;
@@ -83,15 +90,15 @@ public class BrickerGameManager extends GameManager {
 
         // Creating the Ball
         Renderable ballImage =
-                imageReader.readImage("assets/ball.png", true);
+                imageReader.readImage(GameConstants.BALL_ASSET_PATH, true);
         Sound collisionSound = soundReader.readSound(
-                "assets/blop_cut_silenced.wav");
+                GameConstants.COLLISION_SOUND_PATH);
         ball = new Ball(Vector2.ZERO, GameConstants.PRIMARY_BALL_DIMENSIONS, ballImage, collisionSound);
         restartBall(ball, windowDimensions);
         this.gameObjects().addGameObject(ball);
 
         Renderable paddleImage = imageReader.readImage(
-                "assets/paddle.png", true);
+                GameConstants.PADDLE_ASSET_PATH, true);
 
         // Create User Paddle
         userPaddle =
@@ -114,13 +121,13 @@ public class BrickerGameManager extends GameManager {
     }
 
     private static void restartBall(Ball ball, Vector2 windowDimensions) {
-        Utils.randomizeBallVelocity(ball, BALL_SPEED);
+        Utils.randomizeBallVelocity(ball, GameConstants.PRIMARY_BALL_SPEED);
         ball.setCenter(windowDimensions.mult(0.5f));
     }
 
     private void addBackground(ImageReader imageReader) {
         Renderable background = imageReader.readImage(
-                "assets/DARK_BG2_small.jpeg", false);
+                GameConstants.BACKGROUND_ASSET_PATH, false);
         GameObject backgroundObject = new GameObject(
                 Vector2.ZERO, windowDimensions, background);
         backgroundObject.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
@@ -159,7 +166,7 @@ public class BrickerGameManager extends GameManager {
 
     private void createBricks(ImageReader imageReader) {
         Renderable brickImage = imageReader.readImage(
-                "assets/brick.png", false);
+                GameConstants.BRICK_ASSET_PATH, false);
 
         // Calculating the amount of pixels that the bricks can take up
         // this does not include the walls, since the player cannot reach

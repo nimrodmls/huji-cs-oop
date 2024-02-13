@@ -6,25 +6,36 @@ import danogl.gui.Sound;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * Represents a ball game object that can collide with other game objects.
+ */
 public class Ball extends GameObject {
 
     private final Sound collisionSound;
     private int collisionCounter = 0;
 
     /**
-     * Construct a new GameObject instance.
+     * Constructs a new Ball instance.
      *
-     * @param topLeftCorner Position of the object, in window coordinates (pixels).
+     * @param topLeftCorner Position of the ball, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
-     * @param dimensions    Width and height in window coordinates.
-     * @param renderable    The renderable representing the object. Can be null, in which case
-     *                      the GameObject will not be rendered.
+     * @param dimensions    Width and height of the ball in window coordinates.
+     * @param renderable    The renderable representing the ball. Can be null, in which case
+     *                      the ball will not be rendered.
+     * @param collisionSound The sound to be played when the ball collides with another object.
      */
     public Ball(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, Sound collisionSound) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionSound = collisionSound;
     }
 
+    /**
+     * Called when the ball collides with another game object.
+     * Updates the ball's velocity, plays the collision sound, and increments the collision counter.
+     *
+     * @param other     The game object that the ball collided with.
+     * @param collision The collision information.
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
@@ -34,6 +45,11 @@ public class Ball extends GameObject {
         collisionCounter++;
     }
 
+    /**
+     * Gets the number of collisions the ball has encountered.
+     *
+     * @return The collision counter.
+     */
     public int getCollisionCounter() {
         return collisionCounter;
     }
