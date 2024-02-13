@@ -84,8 +84,7 @@ public class DoublePaddleStrategy extends BasicCollisionStrategy {
                         hitCounter,
                         gameManager);
         // We set the new paddle to be in the middle of the screen
-        paddle.setCenter(
-                new Vector2(windowDimensions.x() / 2, windowDimensions.y() / 2));
+        paddle.setCenter(windowDimensions.mult(0.5f));
         gameManager.addGameObject(paddle, Layer.FOREGROUND);
         paddleCounter.increment();
     }

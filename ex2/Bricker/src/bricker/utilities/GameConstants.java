@@ -12,7 +12,15 @@ public class GameConstants {
     /**
      * UI constants
      */
+    public static final String GAME_TITLE = "Bricker";
+    public static final Vector2 WINDOW_SIZE = new Vector2(700, 500);
+    public static final Vector2 UI_GRID_DIMENSIONS_PIXELS = new Vector2(20, WINDOW_SIZE.y() - 60);
+    // The amount of elements in the UI
+    public static final Vector2 UI_GRID_DIMENSIONS_ELEMENTS = new Vector2(4    , 2);
+    // The size of each element in the UI
     public static final Vector2 UI_GRID_ELEMENT_DIMENSIONS = new Vector2(20, 20);
+    public static final String WIN_PROMPT = "You win! Play again?";
+    public static final String LOSE_PROMPT = "You lose! Play again?";
 
     // Asset pathing constants
     public static final String ASSET_DIR_PATH = "assets/";
@@ -24,7 +32,15 @@ public class GameConstants {
     public static final String COLLISION_SOUND_PATH = ASSET_DIR_PATH + "blop_cut_silenced.wav";
     public static final String PUCK_BALL_ASSET_PATH = ASSET_DIR_PATH + "mockBall.png";
 
-    // Ball constants
+    /**
+     * Game State constants
+     */
+    public static final int INITIAL_LIVES = 3;
+    public static final int MAX_LIFE_COUNT = 4;
+
+    /**
+     * Ball constants
+     */
     public static float PRIMARY_BALL_SPEED = 200.0f;
     public static final Vector2 PRIMARY_BALL_DIMENSIONS = new Vector2(20, 20);
 
