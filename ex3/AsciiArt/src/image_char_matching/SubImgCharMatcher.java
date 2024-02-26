@@ -4,12 +4,13 @@ import java.util.*;
 
 public class SubImgCharMatcher {
 
-    private TreeMap<Character, Double> charToBrightness;
+    private final TreeMap<Character, Double> charToBrightness;
     private double maxBrightness = 0;
     private double minBrightness = 0;
 
     public SubImgCharMatcher(char[] charset) {
         charToBrightness = new TreeMap<>();
+
         initBrightnessValues(charset);
     }
 
@@ -19,7 +20,6 @@ public class SubImgCharMatcher {
 
         // Finding the character with the closest brightness to the given brightness
         for (Map.Entry<Character, Double> entry : charToBrightness.entrySet()) {
-            System.out.println(entry.getKey());
             double diff = Math.abs(entry.getValue() - brightness);
             if ((diff < minimalDiff) || (0 == minimalDiff)) {
                 minimalDiff = diff;
@@ -94,6 +94,8 @@ public class SubImgCharMatcher {
     }
 
     private double getLinearStretch(double minBrightness, double maxBrightness, double brightness) {
+        // There is an assumption here that maxBrightness > minBrightness,
+        // hence that they are not equal and the denominator is not 0.
         return (brightness - minBrightness) / (maxBrightness - minBrightness);
     }
 
