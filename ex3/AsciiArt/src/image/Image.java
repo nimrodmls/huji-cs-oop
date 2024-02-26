@@ -52,6 +52,8 @@ public class Image {
         return pixelArray;
     }
 
+    public
+
     public void saveImage(String fileName){
         // Initialize BufferedImage, assuming Color[][] is already properly populated.
         BufferedImage bufferedImage = new BufferedImage(pixelArray[0].length, pixelArray.length,

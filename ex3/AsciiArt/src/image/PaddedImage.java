@@ -5,15 +5,19 @@ import java.io.IOException;
 
 public class PaddedImage extends Image {
 
-    private Image originalImage;
-    private int paddedWidth;
-    private int paddedHeight;
+    private final Image originalImage;
+    private final int paddedWidth;
+    private final int paddedHeight;
+    private final int rowPadding;
+    private final int colPadding;
 
     public PaddedImage(Image image) {
         super(image.getPixelArray(), image.getWidth(), image.getHeight());
         originalImage = image;
         paddedWidth = roundToNextPowerOf2(image.getWidth());
         paddedHeight = roundToNextPowerOf2(image.getHeight());
+        rowPadding = (paddedHeight - originalImage.getHeight()) / 2;
+        colPadding = (paddedWidth - originalImage.getWidth()) / 2;
     }
 
     @Override
@@ -58,19 +62,17 @@ public class PaddedImage extends Image {
     @Override
     public Color getPixel(int x, int y) {
         // The padding is virtual and not part of the original image!
-        int xPadding = (paddedHeight - originalImage.getHeight()) / 2;
-        int yPadding = (paddedWidth - originalImage.getWidth()) / 2;
 
         assert x > 0 && y > 0 && x < paddedWidth && y < paddedHeight : "The pixel is out of bounds";
 
-        if (x < xPadding || // Checking the "left" padding
-            y < yPadding || // Checking the "top" padding
-            x >= originalImage.getHeight() + xPadding || // Checking the "right" padding
-            y >= originalImage.getWidth() + yPadding) { // Checking the "bottom" padding
+        if (x < rowPadding || // Checking the "left" padding
+            y < colPadding || // Checking the "top" padding
+            x >= originalImage.getHeight() + rowPadding || // Checking the "right" padding
+            y >= originalImage.getWidth() + colPadding) { // Checking the "bottom" padding
             return Color.WHITE;
         }
         // If the pixel is not in the padding area, we return the pixel from the original image
-        return originalImage.getPixel(x-xPadding, y-yPadding);
+        return originalImage.getPixel(x-rowPadding, y-colPadding);
     }
 
     private static int roundToNextPowerOf2(int n) {
