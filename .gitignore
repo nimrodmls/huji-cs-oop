@@ -23,9 +23,6 @@
 hs_err_pid*
 replay_pid*
 
-# Custom General
-lib
-
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
