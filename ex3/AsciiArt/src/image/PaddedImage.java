@@ -26,22 +26,38 @@ public class PaddedImage extends Image {
         return paddedHeight;
     }
 
-    /*public Image[] getSubImages(int subImageCount) {
-        Image[] subImages = new Image[subImageCount];
+    public Image[][] getSubImages(int subImageCountInRow) {
         // The sub image is square, hence the width and height are the same.
-        int subImageDimension = paddedWidth / subImageCount;
+        int subImageDimension = paddedWidth / subImageCountInRow;
+        int subImageRows = paddedHeight / subImageDimension;
+        Image[][] subImages = new Image[subImageRows][subImageCountInRow];
 
-        // Creating each sub image
-        for (int currentImageIdx = 0; currentImageIdx < subImageCount; currentImageIdx++) {
-
-
+        for (int currentSubImageRow = 0; currentSubImageRow < subImageRows; currentSubImageRow++) {
+            for (int currentSubImageCol = 0; currentSubImageCol < subImageCountInRow; currentSubImageCol++) {
+                subImages[currentSubImageRow][currentSubImageCol] =
+                        getSubImage(
+                                currentSubImageRow * subImageDimension,
+                                currentSubImageCol * subImageDimension,
+                                subImageDimension);
+            }
         }
 
         return subImages;
-    }*/
+    }
+
+    private Image getSubImage(int x, int y, int dimension) {
+        Color[][] subImagePixelArray = new Color[dimension][dimension];
+        for (int row = 0; row < dimension; row++) {
+            for (int col = 0; col < dimension; col++) {
+                subImagePixelArray[row][col] = getPixel(x + row, y + col);
+            }
+        }
+        return new Image(subImagePixelArray, dimension, dimension);
+    }
 
     @Override
     public Color getPixel(int x, int y) {
+        // The padding is virtual and not part of the original image!
         int xPadding = (paddedHeight - originalImage.getHeight()) / 2;
         int yPadding = (paddedWidth - originalImage.getWidth()) / 2;
 
@@ -56,29 +72,6 @@ public class PaddedImage extends Image {
         // If the pixel is not in the padding area, we return the pixel from the original image
         return originalImage.getPixel(x-xPadding, y-yPadding);
     }
-
-    /*private Image getSubImage(int x, int y, int dimension) {
-        // The sub image is square, hence the width and height are the same.
-        Color[][] subImagePixelArray = new Color[dimension][dimension];
-        for (int row = 0; row < dimension; row++) {
-            int currentImageRowOffset = y * row;
-            for (int col = 0; col < dimension; col++) {
-
-                int currentImageColOffset = x * col;
-                if (currentImageRowOffset + row >= originalImage.getHeight() ||
-                    currentImageColOffset + col >= originalImage.getWidth() ||
-                    currentImageRowOffset
-                ) {
-                    subImagePixelArray[row][col] = Color.WHITE;
-                }
-                else {
-                    subImagePixelArray[row][col] = originalImage.getPixel(currentImageRowOffset + row, currentImageColOffset + col);
-                }
-                subImagePixelArray[row][col] = originalImage.getPixel(currentImageIdx * subImageDimension + col, row);
-            }
-        }
-        subImages[currentImageIdx] = new Image(subImagePixelArray, subImageDimension, subImageDimension);
-    }*/
 
     private static int roundToNextPowerOf2(int n) {
         return (int) Math.pow(2, Math.ceil(Math.log(n) / Math.log(2)));

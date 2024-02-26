@@ -36,6 +36,19 @@ public class AsciiArt {
                 }
                 System.out.println();
             }
+            Image[][] subImages = image.getSubImages(2);
+            for (int i = 0; i < subImages.length; i++) {
+                for (int j = 0; j < subImages[i].length; j++) {
+                    System.out.println("SubImage " + i + " " + j);
+                    for (int k = 0; k < subImages[i][j].getHeight(); k++) {
+                        for (int l = 0; l < subImages[i][j].getWidth(); l++) {
+                            Color current = subImages[i][j].getPixel(k,l);
+                            System.out.print("[" + k + "," + l +"](" + current.getRed() + "," + current.getGreen() + "," + current.getBlue() + ")" + " ");
+                        }
+                        System.out.println();
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
