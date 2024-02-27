@@ -1,7 +1,6 @@
 package image;
 
 import java.awt.*;
-import java.io.IOException;
 
 public class PaddedImage extends Image {
 
@@ -12,7 +11,6 @@ public class PaddedImage extends Image {
     private final int colPadding;
 
     public PaddedImage(Image image) {
-        super(image.getPixelArray(), image.getWidth(), image.getHeight());
         originalImage = image;
         paddedWidth = roundToNextPowerOf2(image.getWidth());
         paddedHeight = roundToNextPowerOf2(image.getHeight());
@@ -30,11 +28,11 @@ public class PaddedImage extends Image {
         return paddedHeight;
     }
 
-    public Image[][] getSubImages(int subImageCountInRow) {
+    public SimpleImage[][] getSubImages(int subImageCountInRow) {
         // The sub image is square, hence the width and height are the same.
         int subImageDimension = paddedWidth / subImageCountInRow;
         int subImageRows = paddedHeight / subImageDimension;
-        Image[][] subImages = new Image[subImageRows][subImageCountInRow];
+        SimpleImage[][] subImages = new SimpleImage[subImageRows][subImageCountInRow];
 
         for (int currentSubImageRow = 0; currentSubImageRow < subImageRows; currentSubImageRow++) {
             for (int currentSubImageCol = 0; currentSubImageCol < subImageCountInRow; currentSubImageCol++) {
@@ -49,14 +47,14 @@ public class PaddedImage extends Image {
         return subImages;
     }
 
-    private Image getSubImage(int x, int y, int dimension) {
+    private SimpleImage getSubImage(int x, int y, int dimension) {
         Color[][] subImagePixelArray = new Color[dimension][dimension];
         for (int row = 0; row < dimension; row++) {
             for (int col = 0; col < dimension; col++) {
                 subImagePixelArray[row][col] = getPixel(x + row, y + col);
             }
         }
-        return new Image(subImagePixelArray, dimension, dimension);
+        return new SimpleImage(subImagePixelArray, dimension, dimension);
     }
 
     @Override

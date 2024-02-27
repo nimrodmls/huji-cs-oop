@@ -1,8 +1,7 @@
 package main;
 
-import image.Image;
+import image.SimpleImage;
 import image.PaddedImage;
-import image_char_matching.SubImgCharMatcher;
 
 import java.awt.*;
 
@@ -28,7 +27,7 @@ public class AsciiArt {
                     {new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0)},
                     {new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0)}
             };
-            image = new PaddedImage(new Image(img, 6, 10));
+            image = new PaddedImage(new SimpleImage(img, 6, 10));
             for (int i = 0; i < image.getHeight(); i++) {
                 for (int j = 0; j < image.getWidth(); j++) {
                     Color current = image.getPixel(i,j);
@@ -36,7 +35,7 @@ public class AsciiArt {
                 }
                 System.out.println();
             }
-            Image[][] subImages = image.getSubImages(2);
+            SimpleImage[][] subImages = image.getSubImages(2);
             for (int i = 0; i < subImages.length; i++) {
                 for (int j = 0; j < subImages[i].length; j++) {
                     System.out.println("SubImage " + i + " " + j);
