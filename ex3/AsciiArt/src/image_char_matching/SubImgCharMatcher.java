@@ -16,12 +16,12 @@ public class SubImgCharMatcher {
 
     public char getCharByImageBrightness(double brightness) {
         char bestMatch = ' ';
-        double minimalDiff = 0;
+        double minimalDiff = 2;
 
         // Finding the character with the closest brightness to the given brightness
         for (Map.Entry<Character, Double> entry : charToBrightness.entrySet()) {
             double diff = Math.abs(entry.getValue() - brightness);
-            if ((diff < minimalDiff) || (0 == minimalDiff)) {
+            if (diff < minimalDiff) {
                 minimalDiff = diff;
                 bestMatch = entry.getKey();
             }
@@ -43,6 +43,7 @@ public class SubImgCharMatcher {
             charToBrightness.put(
                     c, getLinearStretch(minBrightness, maxBrightness, charBrightness));
         } else { // The character's brightness changes the min/max, so we need to update the map
+            // BUG: Possible issue when updating the brightness values, we use the value currently in the dict
             updateBrightnessValues(c, charBrightness);
         }
     }

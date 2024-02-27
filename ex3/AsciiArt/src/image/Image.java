@@ -21,18 +21,19 @@ public abstract class Image {
         return pixelArray;
     }
 
-    public static double[][] getGrayscalePixels(SimpleImage image) {
-        Color[][] pixelArray = image.getPixelArray();
-        double[][] grayscale = new double[image.getHeight()][image.getWidth()];
-        for (int row = 0; row < image.getHeight(); row++) {
-            for (int col = 0; col < image.getWidth(); col++) {
+    public double getImageBrightness() {
+        Color[][] pixelArray = getPixelArray();
+        double grayscaleSum = 0;
+        for (int row = 0; row < getHeight(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
                 Color currentPixel = pixelArray[row][col];
                 double red = currentPixel.getRed() * RED_GRAYSCALE_WEIGHT;
                 double green = currentPixel.getGreen() * GREEN_GRAYSCALE_WEIGHT;
                 double blue = currentPixel.getBlue() * BLUE_GRAYSCALE_WEIGHT;
-                grayscale[row][col] = red + green + blue;
+                grayscaleSum += red + green + blue;
             }
         }
-        return grayscale;
+        // Normalize the sum to be between 0 and 1
+        return grayscaleSum / (getHeight() * getWidth() * 255);
     }
 }

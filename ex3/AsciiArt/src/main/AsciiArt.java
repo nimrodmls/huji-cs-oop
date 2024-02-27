@@ -1,5 +1,8 @@
 package main;
 
+import ascii_art.AsciiArtAlgorithm;
+import ascii_output.ConsoleAsciiOutput;
+import ascii_output.HtmlAsciiOutput;
 import image.SimpleImage;
 import image.PaddedImage;
 
@@ -13,7 +16,7 @@ public class AsciiArt {
         System.out.println("-----");
         subImgCharMatcher.addChar('k');
         c = subImgCharMatcher.getCharByImageBrightness(0.5);*/
-        PaddedImage image = null;
+        /*PaddedImage image = null;
         try {
             Color[][] img = new Color[][] {
                     {new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0)},
@@ -51,6 +54,23 @@ public class AsciiArt {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Done");
+        System.out.println("Done");*/
+        SimpleImage image = null;
+        try {
+            image = new SimpleImage("C:\\temp\\ex3_examples\\cat.jpeg");
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+
+        char[] ascii = new char[256];
+        for (int i = 0; i < 256; i++) {
+            ascii[i] = (char)i;
+        }
+
+        AsciiArtAlgorithm algo = new AsciiArtAlgorithm(image, 256, ascii);
+        char[][] res = algo.run();
+        ConsoleAsciiOutput output2 = new ConsoleAsciiOutput();
+        HtmlAsciiOutput output = new HtmlAsciiOutput("c:\\temp\\ex3_examples\\cat.html", "Courier New");
+        output.out(res);
     }
 }

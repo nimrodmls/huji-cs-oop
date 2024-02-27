@@ -28,14 +28,15 @@ public class PaddedImage extends Image {
         return paddedHeight;
     }
 
-    public SimpleImage[][] getSubImages(int subImageCountInRow) {
+    public SimpleImage[][] getSubImages(int resolution) {
+        // resolution is the number of sub images in each row.
         // The sub image is square, hence the width and height are the same.
-        int subImageDimension = paddedWidth / subImageCountInRow;
+        int subImageDimension = paddedWidth / resolution;
         int subImageRows = paddedHeight / subImageDimension;
-        SimpleImage[][] subImages = new SimpleImage[subImageRows][subImageCountInRow];
+        SimpleImage[][] subImages = new SimpleImage[subImageRows][resolution];
 
         for (int currentSubImageRow = 0; currentSubImageRow < subImageRows; currentSubImageRow++) {
-            for (int currentSubImageCol = 0; currentSubImageCol < subImageCountInRow; currentSubImageCol++) {
+            for (int currentSubImageCol = 0; currentSubImageCol < resolution; currentSubImageCol++) {
                 subImages[currentSubImageRow][currentSubImageCol] =
                         getSubImage(
                                 currentSubImageRow * subImageDimension,
