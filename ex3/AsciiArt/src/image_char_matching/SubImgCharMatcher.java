@@ -14,6 +14,16 @@ public class SubImgCharMatcher {
         initBrightnessValues(charset);
     }
 
+    public char[] getCharset() {
+        char[] charset = new char[charToBrightness.size()];
+        int i = 0;
+        for (char c : charToBrightness.keySet()) {
+            charset[i] = c;
+            i++;
+        }
+        return charset;
+    }
+
     public char getCharByImageBrightness(double brightness) {
         char bestMatch = ' ';
         double minimalDiff = 2;
