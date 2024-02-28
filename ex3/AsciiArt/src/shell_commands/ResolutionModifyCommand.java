@@ -12,11 +12,9 @@ public class ResolutionModifyCommand implements ShellCommand {
     private static final String TOKEN_UP = "up";
     private static final String TOKEN_DOWN = "down";
 
-    private int resolution;
     private final AsciiArtAlgorithm asciiArtAlgorithm;
 
-    public ResolutionModifyCommand(int defaultResolution, AsciiArtAlgorithm asciiArtAlgorithm) {
-        this.resolution = defaultResolution;
+    public ResolutionModifyCommand(AsciiArtAlgorithm asciiArtAlgorithm) {
         this.asciiArtAlgorithm = asciiArtAlgorithm;
     }
 
@@ -27,7 +25,7 @@ public class ResolutionModifyCommand implements ShellCommand {
         }
 
         String token = arguments[0];
-        int newResolution = resolution;
+        int newResolution = asciiArtAlgorithm.getResolution();
         switch (token) {
             case TOKEN_UP:
                 newResolution *= 2;
@@ -42,7 +40,7 @@ public class ResolutionModifyCommand implements ShellCommand {
         if (!validateResolution(newResolution)) {
             throw new InvalidCommandFormatException(CRITICAL_RESOLUTION_MESSAGE);
         }
-        resolution = newResolution;
+        asciiArtAlgorithm.setResolution(newResolution);
         System.out.printf(RESOLUTION_CHANGED_MESSAGE, newResolution);
     }
 
