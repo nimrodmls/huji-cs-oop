@@ -19,9 +19,9 @@ public class Shell {
             System.out.println("error");
         }
 
-        char[] ascii = new char[95];
-        for (int i = 32; i < 127; i++) {
-            ascii[i-32] = (char)i;
+        char[] ascii = new char[10];
+        for (int i = 0; i < 10; i++) {
+            ascii[i] = (char)((int)'0' + i);
         }
 
         AsciiArtAlgorithm asciiArtAlgorithm = new AsciiArtAlgorithm(image, 256, ascii);
@@ -38,7 +38,12 @@ public class Shell {
 
              ShellCommand command = commands.get(commandTokens[0]);
              String[] commandArgs = Arrays.copyOfRange(commandTokens, 1, commandTokens.length);
-             command.execute(commandArgs);
+
+             try {
+                 command.execute(commandArgs);
+             } catch (Exception e) {
+                 System.out.println(e.getMessage());
+             }
 
         } while (!userInput.equals("exit"));
 

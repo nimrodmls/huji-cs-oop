@@ -16,5 +16,6 @@ public class CharDisplayCommand implements ShellCommand {
         for (char c : charset) {
             System.out.print(c + " ");
         }
+        System.out.println();
     }
 }
