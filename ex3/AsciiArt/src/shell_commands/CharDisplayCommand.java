@@ -11,7 +11,7 @@ public class CharDisplayCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] arguments) {
         char[] charset = asciiArtAlgorithm.getCharset();
         for (char c : charset) {
             System.out.print(c + " ");

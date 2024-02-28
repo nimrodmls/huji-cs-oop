@@ -33,17 +33,21 @@ public class Shell {
 
         do {
             System.out.print(">>> ");
-             userInput = KeyboardInput.readLine();
-             String[] commandTokens = userInput.split(" ");
+            userInput = KeyboardInput.readLine();
+            String[] commandTokens = userInput.split(" ");
 
-             ShellCommand command = commands.get(commandTokens[0]);
-             String[] commandArgs = Arrays.copyOfRange(commandTokens, 1, commandTokens.length);
+            ShellCommand command = commands.get(commandTokens[0]);
+            if (command == null) {
+                System.out.println("Did not execute due to incorrect command.");
+                continue;
+            }
 
-             try {
+            String[] commandArgs = Arrays.copyOfRange(commandTokens, 1, commandTokens.length);
+            try {
                  command.execute(commandArgs);
-             } catch (Exception e) {
+            } catch (Exception e) {
                  System.out.println(e.getMessage());
-             }
+            }
 
         } while (!userInput.equals("exit"));
 

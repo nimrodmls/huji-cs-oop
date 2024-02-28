@@ -22,12 +22,12 @@ public class CharModifyCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] args) throws InvalidCommandFormatException {
-        if (1 != args.length) {
+    public void execute(String[] arguments) throws InvalidCommandFormatException {
+        if (1 != arguments.length) {
             throw new InvalidCommandFormatException(getErrorMessage());
         }
 
-        String token = args[0];
+        String token = arguments[0];
         switch (token) {
             case TOKEN_SPACE:
                 modifyChar(' ');

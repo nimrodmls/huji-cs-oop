@@ -41,6 +41,10 @@ public class AsciiArtAlgorithm {
         destinationImage = new PaddedImage(newImage);
     }
 
+    public Image getImage() {
+        return destinationImage;
+    }
+
     public char[][] run() {
         SimpleImage[][] subImages = destinationImage.getSubImages(resolution);
         char[][] asciiArt = new char[subImages.length][subImages[0].length];
