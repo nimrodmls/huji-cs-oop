@@ -5,11 +5,13 @@ import java.util.*;
 public class SubImgCharMatcher {
 
     private final TreeMap<Character, Double> charToBrightness;
+    private final TreeMap<Character, Double> charToNormalizedBrightness;
     private double maxBrightness = 0;
-    private double minBrightness = 0;
+    private double minBrightness = 2;
 
     public SubImgCharMatcher(char[] charset) {
         charToBrightness = new TreeMap<>();
+        charToNormalizedBrightness = new TreeMap<>();
 
         initBrightnessValues(charset);
     }
@@ -29,7 +31,7 @@ public class SubImgCharMatcher {
         double minimalDiff = 2;
 
         // Finding the character with the closest brightness to the given brightness
-        for (Map.Entry<Character, Double> entry : charToBrightness.entrySet()) {
+        for (Map.Entry<Character, Double> entry : charToNormalizedBrightness.entrySet()) {
             double diff = Math.abs(entry.getValue() - brightness);
             if (diff < minimalDiff) {
                 minimalDiff = diff;
@@ -47,25 +49,24 @@ public class SubImgCharMatcher {
         }
 
         double charBrightness = getCharBrightness(c);
+        charToBrightness.put(c, charBrightness);
         // If the character's brightness doesn't change the min/max, we just add it to the map
         // after performing the linear stretching
-        if ((charBrightness <= maxBrightness) || (charBrightness >= minBrightness)) {
-            charToBrightness.put(
+        if ((charBrightness <= maxBrightness) && (charBrightness >= minBrightness)) {
+            charToNormalizedBrightness.put(
                     c, getLinearStretch(minBrightness, maxBrightness, charBrightness));
         } else { // The character's brightness changes the min/max, so we need to update the map
-            // BUG: Possible issue when updating the brightness values, we use the value currently in the dict
             updateBrightnessValues(c, charBrightness);
         }
     }
 
     public void removeChar(char c) {
+        // TODO: Need to update values
         charToBrightness.remove(c);
+        charToNormalizedBrightness.remove(c);
     }
 
     private void initBrightnessValues(char[] charset) {
-        maxBrightness = 0;
-        minBrightness = 1;
-
         for (char c : charset) {
             double charBrightness = getCharBrightness(c);
             charToBrightness.put(c, charBrightness);
@@ -85,7 +86,6 @@ public class SubImgCharMatcher {
 
     private void updateBrightnessValues(char c, double brightness) {
 
-        charToBrightness.put(c, brightness);
         if (brightness > maxBrightness) {
             maxBrightness = brightness;
         }
@@ -100,7 +100,7 @@ public class SubImgCharMatcher {
         for (Map.Entry<Character, Double> entry : charToBrightness.entrySet()) {
             double newBrightness =
                     getLinearStretch(minBrightness, maxBrightness, entry.getValue());
-            charToBrightness.put(entry.getKey(), newBrightness);
+            charToNormalizedBrightness.put(entry.getKey(), newBrightness);
         }
     }
 

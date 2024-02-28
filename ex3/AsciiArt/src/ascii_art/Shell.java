@@ -30,6 +30,11 @@ public class Shell {
             System.out.println(DEFAULT_IMAGE_LOAD_ERROR_MESSAGE);
         }
 
+/*        char[] charset = new char[95];
+        for (int i = 0; i < 95; i++) {
+            charset[i] = (char) (i + 32);
+        }*/
+
         // Starting the algorithm with default values
         AsciiArtAlgorithm asciiArtAlgorithm = new AsciiArtAlgorithm(
                 defaultImage, DEFAULT_RESOLUTION, DEFAULT_CHARSET);

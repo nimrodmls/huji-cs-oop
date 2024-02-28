@@ -6,7 +6,7 @@ import exceptions.InvalidCommandFormatException;
 public class CharModifyCommand implements ShellCommand {
 
     private static final int ALL_CHARS_START_ORD = 32;
-    private static final int ALL_CHARS_END_ORD = 127;
+    private static final int ALL_CHARS_END_ORD = 126;
     private static final String INVALID_ADD_COMMAND_FORMAT_MESSAGE = "Did not add due to incorrect format.";
     private static final String INVALID_REMOVE_COMMAND_FORMAT_MESSAGE = "Did not remove due to incorrect format.";
     private static final String TOKEN_ALL_CHARS = "all";
