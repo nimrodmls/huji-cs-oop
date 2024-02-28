@@ -1,6 +1,7 @@
 package main;
 
 import ascii_art.AsciiArtAlgorithm;
+import ascii_art.Shell;
 import ascii_output.ConsoleAsciiOutput;
 import ascii_output.HtmlAsciiOutput;
 import image.SimpleImage;
@@ -55,13 +56,8 @@ public class AsciiArt {
             e.printStackTrace();
         }
         System.out.println("Done");*/
-        SimpleImage image = null;
-        try {
-            image = new SimpleImage("C:\\temp\\ex3_examples\\cat.jpeg");
-        } catch (Exception e) {
-            System.out.println("error");
-        }
 
+/*
         char[] ascii = new char[256];
         for (int i = 0; i < 256; i++) {
             ascii[i] = (char)i;
@@ -71,6 +67,9 @@ public class AsciiArt {
         char[][] res = algo.run();
         ConsoleAsciiOutput output2 = new ConsoleAsciiOutput();
         HtmlAsciiOutput output = new HtmlAsciiOutput("c:\\temp\\ex3_examples\\cat.html", "Courier New");
-        output.out(res);
+        output.out(res);*/
+
+        Shell shell = new Shell();
+        shell.run();
     }
 }

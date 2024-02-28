@@ -1,5 +1,6 @@
 package ascii_art;
 
+import image.SimpleImage;
 import shell_commands.ShellCommand;
 import shell_commands.ShellCommandFactory;
 
@@ -11,17 +12,33 @@ public class Shell {
     private HashMap<String, ShellCommand> commands;
 
     public Shell() {
-        commands = new ShellCommandFactory().createCommands();
+        SimpleImage image = null;
+        try {
+            image = new SimpleImage("C:\\temp\\ex3_examples\\cat.jpeg");
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+
+        char[] ascii = new char[95];
+        for (int i = 32; i < 127; i++) {
+            ascii[i-32] = (char)i;
+        }
+
+        AsciiArtAlgorithm asciiArtAlgorithm = new AsciiArtAlgorithm(image, 256, ascii);
+        commands = ShellCommandFactory.createCommands(asciiArtAlgorithm);
     }
 
     public void run() {
         String userInput = null;
 
         do {
+            System.out.print(">>> ");
              userInput = KeyboardInput.readLine();
              String[] commandTokens = userInput.split(" ");
-             // Executing the command - The first token is the command name, the rest are the arguments
-             commands.get(commandTokens[0]).execute(Arrays.copyOfRange(commandTokens, 1, commandTokens.length));
+
+             ShellCommand command = commands.get(commandTokens[0]);
+             String[] commandArgs = Arrays.copyOfRange(commandTokens, 1, commandTokens.length);
+             command.execute(commandArgs);
 
         } while (!userInput.equals("exit"));
 
