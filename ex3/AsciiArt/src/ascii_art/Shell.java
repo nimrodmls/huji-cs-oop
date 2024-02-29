@@ -1,5 +1,6 @@
 package ascii_art;
 
+import exceptions.ShellCommandException;
 import image.SimpleImage;
 import shell_commands.OutputCommand;
 import shell_commands.ShellCommand;
@@ -30,11 +31,6 @@ public class Shell {
             System.out.println(DEFAULT_IMAGE_LOAD_ERROR_MESSAGE);
         }
 
-/*        char[] charset = new char[95];
-        for (int i = 0; i < 95; i++) {
-            charset[i] = (char) (i + 32);
-        }*/
-
         // Starting the algorithm with default values
         AsciiArtAlgorithm asciiArtAlgorithm = new AsciiArtAlgorithm(
                 defaultImage, DEFAULT_RESOLUTION, DEFAULT_CHARSET);
@@ -60,14 +56,15 @@ public class Shell {
             String[] commandArgs = Arrays.copyOfRange(commandTokens, 1, commandTokens.length);
             try {
                  command.execute(commandArgs);
-            } catch (Exception e) {
+            } catch (ShellCommandException e) {
                  System.out.println(e.getMessage());
             }
 
         } while (!userInput.equals(EXIT_COMMAND));
     }
 
-    public void setOutputMethod() {
-
+    public static void main(String[] args) {
+        Shell shell = new Shell();
+        shell.run();
     }
 }

@@ -5,7 +5,7 @@ import ascii_art.OutputController;
 
 import java.util.HashMap;
 
-public class ShellCommandFactory {
+public class ShellCommandFactory extends OutputCommand {
 
     public static HashMap<String, ShellCommand> createCommands(
             AsciiArtAlgorithm asciiArtAlgorithm, OutputController outputController) {

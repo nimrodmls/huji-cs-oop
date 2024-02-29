@@ -1,9 +1,8 @@
 package shell_commands;
 
-import ascii_art.Shell;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 
 public interface ShellCommand {
 
-    void execute(String[] arguments) throws InvalidCommandFormatException;
+    void execute(String[] arguments) throws ShellCommandException;
 }

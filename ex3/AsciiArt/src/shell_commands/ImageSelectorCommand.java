@@ -1,10 +1,9 @@
 package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 import image.Image;
 import image.SimpleImage;
-import main.AsciiArt;
 
 import java.io.IOException;
 
@@ -18,16 +17,16 @@ public class ImageSelectorCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] arguments) throws InvalidCommandFormatException {
+    public void execute(String[] arguments) throws ShellCommandException {
         if (1 != arguments.length) {
-            throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+            throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
         Image image;
         try {
             image = new SimpleImage(arguments[0]);
         } catch (IOException e) {
-            throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+            throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
         asciiArtAlgorithm.setImage(image);

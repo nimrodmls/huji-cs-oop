@@ -56,14 +56,25 @@ public class SubImgCharMatcher {
             charToNormalizedBrightness.put(
                     c, getLinearStretch(minBrightness, maxBrightness, charBrightness));
         } else { // The character's brightness changes the min/max, so we need to update the map
-            updateBrightnessValues(c, charBrightness);
+            updateMinMax(charBrightness);
+            updateLinearStretch();
         }
     }
 
     public void removeChar(char c) {
-        // TODO: Need to update values
         charToBrightness.remove(c);
         charToNormalizedBrightness.remove(c);
+
+        // Finding new min and max brightness values
+        for (Map.Entry<Character, Double> entry : charToBrightness.entrySet()) {
+            updateMinMax(entry.getValue());
+        }
+
+        updateLinearStretch();
+    }
+
+    public boolean inCharset(char c) {
+        return charToBrightness.containsKey(c);
     }
 
     private void initBrightnessValues(char[] charset) {
@@ -72,19 +83,13 @@ public class SubImgCharMatcher {
             charToBrightness.put(c, charBrightness);
 
             // Updating the max and min brightness values
-            if (charBrightness > maxBrightness) {
-                maxBrightness = charBrightness;
-            }
-            if (charBrightness < minBrightness) {
-                minBrightness = charBrightness;
-            }
+            updateMinMax(charBrightness);
         }
 
-        // Performing the linear stretching as described in the assignment
         updateLinearStretch();
     }
 
-    private void updateBrightnessValues(char c, double brightness) {
+    private void updateMinMax(double brightness) {
 
         if (brightness > maxBrightness) {
             maxBrightness = brightness;
@@ -92,8 +97,6 @@ public class SubImgCharMatcher {
         if (brightness < minBrightness) {
             minBrightness = brightness;
         }
-
-        updateLinearStretch();
     }
 
     private void updateLinearStretch() {

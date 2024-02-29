@@ -10,6 +10,7 @@ public class AsciiArtAlgorithm {
     private final SubImgCharMatcher charMatcher;
     private PaddedImage destinationImage;
     private int resolution;
+    private char[][] asciiArt = null;
 
     public AsciiArtAlgorithm(Image image, int resolution, char[] charset) {
         destinationImage = new PaddedImage(image);
@@ -22,11 +23,23 @@ public class AsciiArtAlgorithm {
     }
 
     public void addChar(char c) {
+        if (charMatcher.inCharset(c)) {
+            return;
+        }
+
         charMatcher.addChar(c);
+        // Reset the asciiArt so that it will be recalculated - There are new characters in the charset
+        asciiArt = null;
     }
 
     public void removeChar(char c) {
+        if (!charMatcher.inCharset(c)) {
+            return;
+        }
+
         charMatcher.removeChar(c);
+        // Reset the asciiArt so that it will be recalculated - There are characters removed from the charset
+        asciiArt = null;
     }
 
     public int getResolution() {
@@ -34,11 +47,19 @@ public class AsciiArtAlgorithm {
     }
 
     public void setResolution(int newResolution) {
+        if (newResolution == resolution) {
+            return;
+        }
+
         resolution = newResolution;
+        // Reset the asciiArt so that it will be recalculated - There's a new subimage resolution
+        asciiArt = null;
     }
 
     public void setImage(Image newImage) {
         destinationImage = new PaddedImage(newImage);
+        // Reset the asciiArt so that it will be recalculated - There's a new image
+        asciiArt = null;
     }
 
     public Image getImage() {
@@ -46,6 +67,11 @@ public class AsciiArtAlgorithm {
     }
 
     public char[][] run() {
+        // There's a cached version of the asciiArt
+        if (null != asciiArt) {
+            return asciiArt;
+        }
+
         SimpleImage[][] subImages = destinationImage.getSubImages(resolution);
         char[][] asciiArt = new char[subImages.length][subImages[0].length];
         for (int i = 0; i < subImages.length; i++) {
@@ -55,7 +81,8 @@ public class AsciiArtAlgorithm {
                 asciiArt[i][j] = charMatcher.getCharByImageBrightness(brightness);
             }
         }
-        // TODO: Add caching of the result
+
+        this.asciiArt = asciiArt;
         return asciiArt;
     }
 }

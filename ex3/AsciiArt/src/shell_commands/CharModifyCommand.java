@@ -1,7 +1,7 @@
 package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 
 public class CharModifyCommand implements ShellCommand {
 
@@ -22,9 +22,9 @@ public class CharModifyCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] arguments) throws InvalidCommandFormatException {
+    public void execute(String[] arguments) throws ShellCommandException {
         if (1 != arguments.length) {
-            throw new InvalidCommandFormatException(getErrorMessage());
+            throw new ShellCommandException(getErrorMessage());
         }
 
         String token = arguments[0];
@@ -41,7 +41,7 @@ public class CharModifyCommand implements ShellCommand {
         }
     }
 
-    private void addGeneralChars(String args) throws InvalidCommandFormatException {
+    private void addGeneralChars(String args) throws ShellCommandException {
         // Adding a single char
         if (1 == args.length()) {
             modifyChar(args.charAt(0));
@@ -61,7 +61,7 @@ public class CharModifyCommand implements ShellCommand {
 
         // Received invalid format
         } else {
-            throw new InvalidCommandFormatException(getErrorMessage());
+            throw new ShellCommandException(getErrorMessage());
         }
     }
 

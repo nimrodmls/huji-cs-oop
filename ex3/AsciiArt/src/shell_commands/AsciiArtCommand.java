@@ -2,7 +2,7 @@ package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
 import ascii_art.OutputController;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 
 public class AsciiArtCommand implements ShellCommand {
 
@@ -16,9 +16,9 @@ public class AsciiArtCommand implements ShellCommand {
     }
 
         @Override
-        public void execute(String[] arguments) throws InvalidCommandFormatException {
+        public void execute(String[] arguments) throws ShellCommandException {
             if (0 == asciiArtAlgorithm.getCharset().length) {
-                throw new InvalidCommandFormatException("Did not execute. Charset is empty.");
+                throw new ShellCommandException("Did not execute. Charset is empty.");
             }
 
             char[][] asciiArt = asciiArtAlgorithm.run();

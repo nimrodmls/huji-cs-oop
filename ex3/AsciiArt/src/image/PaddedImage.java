@@ -28,6 +28,22 @@ public class PaddedImage extends Image {
         return paddedHeight;
     }
 
+    @Override
+    public Color getPixel(int x, int y) {
+        // The padding is virtual and not part of the original image!
+
+        assert x > 0 && y > 0 && x < paddedWidth && y < paddedHeight : "The pixel is out of bounds";
+
+        if (x < rowPadding || // Checking the "left" padding
+                y < colPadding || // Checking the "top" padding
+                x >= originalImage.getHeight() + rowPadding || // Checking the "right" padding
+                y >= originalImage.getWidth() + colPadding) { // Checking the "bottom" padding
+            return Color.WHITE;
+        }
+        // If the pixel is not in the padding area, we return the pixel from the original image
+        return originalImage.getPixel(x-rowPadding, y-colPadding);
+    }
+
     public SimpleImage[][] getSubImages(int resolution) {
         // resolution is the number of sub images in each row.
         // The sub image is square, hence the width and height are the same.
@@ -56,22 +72,6 @@ public class PaddedImage extends Image {
             }
         }
         return new SimpleImage(subImagePixelArray, dimension, dimension);
-    }
-
-    @Override
-    public Color getPixel(int x, int y) {
-        // The padding is virtual and not part of the original image!
-
-        assert x > 0 && y > 0 && x < paddedWidth && y < paddedHeight : "The pixel is out of bounds";
-
-        if (x < rowPadding || // Checking the "left" padding
-            y < colPadding || // Checking the "top" padding
-            x >= originalImage.getHeight() + rowPadding || // Checking the "right" padding
-            y >= originalImage.getWidth() + colPadding) { // Checking the "bottom" padding
-            return Color.WHITE;
-        }
-        // If the pixel is not in the padding area, we return the pixel from the original image
-        return originalImage.getPixel(x-rowPadding, y-colPadding);
     }
 
     private static int roundToNextPowerOf2(int n) {

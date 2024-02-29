@@ -1,7 +1,7 @@
 package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 import image.Image;
 
 public class ResolutionModifyCommand implements ShellCommand {
@@ -19,9 +19,9 @@ public class ResolutionModifyCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] arguments) throws InvalidCommandFormatException {
+    public void execute(String[] arguments) throws ShellCommandException {
         if (1 != arguments.length) {
-            throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+            throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
         String token = arguments[0];
@@ -34,11 +34,11 @@ public class ResolutionModifyCommand implements ShellCommand {
                 newResolution /= 2;
                 break;
             default:
-                throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+                throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
         if (!validateResolution(newResolution)) {
-            throw new InvalidCommandFormatException(CRITICAL_RESOLUTION_MESSAGE);
+            throw new ShellCommandException(CRITICAL_RESOLUTION_MESSAGE);
         }
         asciiArtAlgorithm.setResolution(newResolution);
         System.out.printf(RESOLUTION_CHANGED_MESSAGE, newResolution);

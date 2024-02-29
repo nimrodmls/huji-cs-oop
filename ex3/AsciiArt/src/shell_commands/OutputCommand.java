@@ -2,7 +2,7 @@ package shell_commands;
 
 import ascii_art.OutputController;
 import ascii_art.OutputMethod;
-import exceptions.InvalidCommandFormatException;
+import exceptions.ShellCommandException;
 
 public class OutputCommand implements ShellCommand {
 
@@ -17,9 +17,9 @@ public class OutputCommand implements ShellCommand {
     }
 
     @Override
-    public void execute(String[] arguments) throws InvalidCommandFormatException {
+    public void execute(String[] arguments) throws ShellCommandException {
         if (1 != arguments.length) {
-            throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+            throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
         String outputMethod = arguments[0];
@@ -31,7 +31,7 @@ public class OutputCommand implements ShellCommand {
                 outputController.setOutputMethod(OutputMethod.CONSOLE);
                 break;
             default:
-                throw new InvalidCommandFormatException(INVALID_ARGUMENT_MESSAGE);
+                throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
     }
 }
