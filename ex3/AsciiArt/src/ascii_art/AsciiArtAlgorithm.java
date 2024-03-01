@@ -1,8 +1,8 @@
 package ascii_art;
 
-import image.Image;
+import image.BaseImage;
 import image.PaddedImage;
-import image.SimpleImage;
+import image.Image;
 import image_char_matching.SubImgCharMatcher;
 
 /**
@@ -22,7 +22,7 @@ public class AsciiArtAlgorithm {
      * @param resolution The number of sub images in each row
      * @param charset The characters to be used in the ascii art
      */
-    public AsciiArtAlgorithm(Image image, int resolution, char[] charset) {
+    public AsciiArtAlgorithm(BaseImage image, int resolution, char[] charset) {
         destinationImage = new PaddedImage(image);
         this.resolution = resolution;
         charMatcher = new SubImgCharMatcher(charset);
@@ -87,7 +87,7 @@ public class AsciiArtAlgorithm {
     /**
      * @param newImage The new image to be converted to ascii art
      */
-    public void setImage(Image newImage) {
+    public void setImage(BaseImage newImage) {
         destinationImage = new PaddedImage(newImage);
         // Reset the asciiArt so that it will be recalculated - There's a new image
         asciiArt = null;
@@ -96,7 +96,7 @@ public class AsciiArtAlgorithm {
     /**
      * @return The image to be converted to ASCII art
      */
-    public Image getImage() {
+    public BaseImage getImage() {
         return destinationImage;
     }
 
@@ -111,11 +111,11 @@ public class AsciiArtAlgorithm {
             return asciiArt;
         }
 
-        SimpleImage[][] subImages = destinationImage.getSubImages(resolution);
+        Image[][] subImages = destinationImage.getSubImages(resolution);
         char[][] asciiArt = new char[subImages.length][subImages[0].length];
         for (int i = 0; i < subImages.length; i++) {
             for (int j = 0; j < subImages[i].length; j++) {
-                SimpleImage currentSubImage = subImages[i][j];
+                Image currentSubImage = subImages[i][j];
                 double brightness = currentSubImage.getImageBrightness();
                 asciiArt[i][j] = charMatcher.getCharByImageBrightness(brightness);
             }

@@ -15,6 +15,10 @@ public class CharConverter {
     private static final double X_OFFSET_FACTOR = 0.2;
     private static final double Y_OFFSET_FACTOR = 0.75;
     private static final String FONT_NAME = "Courier New";
+    /**
+     * The default pixel resolution for the conversion
+     * (added primarily because the presubmit check failed without it).
+     */
     public static final int DEFAULT_PIXEL_RESOLUTION = 16;
 
     /**
@@ -33,6 +37,12 @@ public class CharConverter {
         return matrix;
     }
 
+    /**
+     * @param c The character to be converted to an image
+     * @param fontName The name of the font to be used
+     * @param pixelsPerRow The number of pixels per row
+     * @return A BufferedImage of the character
+     */
     private static BufferedImage getBufferedImage(char c, String fontName, int pixelsPerRow) {
         String charStr = Character.toString(c);
         Font font = new Font(fontName, Font.PLAIN, pixelsPerRow);

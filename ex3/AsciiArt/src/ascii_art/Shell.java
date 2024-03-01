@@ -1,8 +1,7 @@
 package ascii_art;
 
 import exceptions.ShellCommandException;
-import image.SimpleImage;
-import shell_commands.OutputCommand;
+import image.Image;
 import shell_commands.ShellCommand;
 import shell_commands.ShellCommandFactory;
 
@@ -32,9 +31,9 @@ public class Shell {
      * Constructs a new Shell object with the default values for the ASCII Art program.
      */
     public Shell() {
-        SimpleImage defaultImage = null;
+        Image defaultImage = null;
         try {
-            defaultImage = new SimpleImage(DEFAULT_IMAGE_PATH);
+            defaultImage = new Image(DEFAULT_IMAGE_PATH);
         } catch (Exception e) {
             System.out.println(DEFAULT_IMAGE_LOAD_ERROR_MESSAGE);
         }
@@ -76,6 +75,11 @@ public class Shell {
         } while (!userInput.equals(EXIT_COMMAND));
     }
 
+    /**
+     * The main method of the program, runs the shell.
+     * No command line arguments are expected.
+     * @param args The command line arguments
+     */
     public static void main(String[] args) {
         Shell shell = new Shell();
         shell.run();

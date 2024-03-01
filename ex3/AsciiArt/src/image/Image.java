@@ -1,63 +1,98 @@
 package image;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
- * An abstract class representing an image. Providing generic methods for image handling.
+ * A simple (raw) representation of an image.
  * @author Nimrod M.
  */
-public abstract class Image {
-    private static final double RED_GRAYSCALE_WEIGHT = 0.2126;
-    private static final double GREEN_GRAYSCALE_WEIGHT = 0.7152;
-    private static final double BLUE_GRAYSCALE_WEIGHT = 0.0722;
+public class Image extends BaseImage {
+
+    private final Color[][] pixelArray;
+    private final int width;
+    private final int height;
+
+    /**
+     * Constructs a new Image object using the given file.
+     * @param filename The name of the file to be read the image from
+     * @throws IOException If the file is not found
+     */
+    public Image(String filename) throws IOException {
+        BufferedImage im = ImageIO.read(new File(filename));
+        width = im.getWidth();
+        height = im.getHeight();
+
+
+        pixelArray = new Color[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                pixelArray[i][j]=new Color(im.getRGB(j, i));
+            }
+        }
+    }
+
+    /**
+     * Constructs a new Image object using the given pixel array (and its dimensions).
+     * @param pixelArray The pixel array of the image
+     * @param width The width of the image
+     * @param height The height of the image
+     */
+    public Image(Color[][] pixelArray, int width, int height) {
+        this.pixelArray = pixelArray;
+        this.width = width;
+        this.height = height;
+    }
 
     /**
      * @return The width of the image
      */
-    public abstract int getWidth();
+    @Override
+    public int getWidth() {
+        return width;
+    }
 
     /**
      * @return The height of the image
      */
-    public abstract int getHeight();
+    @Override
+    public int getHeight() {
+        return height;
+    }
 
     /**
+     * Retrieves the pixel color values at the given coordinates.
      * @param x The row coordinate of the pixel
      * @param y The column coordinate of the pixel
      * @return The pixel color values at the given coordinates
      */
-    public abstract Color getPixel(int x, int y);
-
-    /**
-     * @return The pixel array of the image
-     */
-    public Color[][] getPixelArray() {
-        Color[][] pixelArray = new Color[getHeight()][getWidth()];
-        for (int i = 0; i < getHeight(); i++) {
-            for (int j = 0; j < getWidth(); j++) {
-                pixelArray[i][j] = getPixel(i, j);
-            }
-        }
-        return pixelArray;
+    @Override
+    public Color getPixel(int x, int y) {
+        return pixelArray[x][y];
     }
 
     /**
-     * Calculates the brightness of the image.
-     * @return The brightness of the image
+     * Saves the image to a file.
+     * @param fileName The name of the file to save the image to
      */
-    public double getImageBrightness() {
-        Color[][] pixelArray = getPixelArray();
-        double grayscaleSum = 0;
-        for (int row = 0; row < getHeight(); row++) {
-            for (int col = 0; col < getWidth(); col++) {
-                Color currentPixel = pixelArray[row][col];
-                double red = currentPixel.getRed() * RED_GRAYSCALE_WEIGHT;
-                double green = currentPixel.getGreen() * GREEN_GRAYSCALE_WEIGHT;
-                double blue = currentPixel.getBlue() * BLUE_GRAYSCALE_WEIGHT;
-                grayscaleSum += red + green + blue;
+    public void saveImage(String fileName){
+        // Initialize BufferedImage, assuming Color[][] is already properly populated.
+        BufferedImage bufferedImage = new BufferedImage(pixelArray[0].length, pixelArray.length,
+                BufferedImage.TYPE_INT_RGB);
+        // Set each pixel of the BufferedImage to the color from the Color[][].
+        for (int x = 0; x < pixelArray.length; x++) {
+            for (int y = 0; y < pixelArray[x].length; y++) {
+                bufferedImage.setRGB(y, x, pixelArray[x][y].getRGB());
             }
         }
-        // Normalize the sum to be between 0 and 1
-        return grayscaleSum / (getHeight() * getWidth() * 255);
+        File outputfile = new File(fileName+".jpeg");
+        try {
+            ImageIO.write(bufferedImage, "jpeg", outputfile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

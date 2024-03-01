@@ -2,7 +2,7 @@ package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
 import exceptions.ShellCommandException;
-import image.Image;
+import image.BaseImage;
 
 /**
  * A command that changes the resolution of the ASCII Art to the user.
@@ -62,7 +62,7 @@ public class ResolutionModifyCommand implements ShellCommand {
     }
 
     private boolean validateResolution(int resolution) {
-        Image image = asciiArtAlgorithm.getImage();
+        BaseImage image = asciiArtAlgorithm.getImage();
         int minCharsInRow = Math.max(
                 1, image.getWidth() / image.getHeight());
         int maxCharsInRow = image.getWidth();

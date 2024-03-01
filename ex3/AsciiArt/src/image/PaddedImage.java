@@ -6,9 +6,9 @@ import java.awt.*;
  * Representing an image padded to nearest square.
  * @author Nimrod M.
  */
-public class PaddedImage extends Image {
+public class PaddedImage extends BaseImage {
 
-    private final Image originalImage;
+    private final BaseImage originalImage;
     private final int paddedWidth;
     private final int paddedHeight;
     private final int rowPadding;
@@ -16,13 +16,16 @@ public class PaddedImage extends Image {
 
     /**
      * Constructs a new PaddedImage object using the given image.
-     * If the image is not squared, it will be padded to the nearest square, otherwise it will remain the same.
+     * If the image is not squared, it will be padded to the nearest square,
+     * otherwise it will remain the same.
      * @param image The image to be padded
      */
-    public PaddedImage(Image image) {
+    public PaddedImage(BaseImage image) {
         originalImage = image;
         paddedWidth = roundToNextPowerOf2(image.getWidth());
         paddedHeight = roundToNextPowerOf2(image.getHeight());
+        // The padding added to the original image,
+        // these are balanced on both sides of the image respectively
         rowPadding = (paddedHeight - originalImage.getHeight()) / 2;
         colPadding = (paddedWidth - originalImage.getWidth()) / 2;
     }
@@ -69,11 +72,11 @@ public class PaddedImage extends Image {
      * @param resolution The number of sub images in each row
      * @return A 2D array of sub images
      */
-    public SimpleImage[][] getSubImages(int resolution) {
+    public Image[][] getSubImages(int resolution) {
         // The sub image is square, hence the width and height are the same.
         int subImageDimension = paddedWidth / resolution;
         int subImageRows = paddedHeight / subImageDimension;
-        SimpleImage[][] subImages = new SimpleImage[subImageRows][resolution];
+        Image[][] subImages = new Image[subImageRows][resolution];
 
         for (int currentSubImageRow = 0; currentSubImageRow < subImageRows; currentSubImageRow++) {
             for (int currentSubImageCol = 0; currentSubImageCol < resolution; currentSubImageCol++) {
@@ -96,14 +99,14 @@ public class PaddedImage extends Image {
      * @param dimension The dimension of the sub image
      * @return A sub image of the padded image
      */
-    private SimpleImage getSubImage(int x, int y, int dimension) {
+    private Image getSubImage(int x, int y, int dimension) {
         Color[][] subImagePixelArray = new Color[dimension][dimension];
         for (int row = 0; row < dimension; row++) {
             for (int col = 0; col < dimension; col++) {
                 subImagePixelArray[row][col] = getPixel(x + row, y + col);
             }
         }
-        return new SimpleImage(subImagePixelArray, dimension, dimension);
+        return new Image(subImagePixelArray, dimension, dimension);
     }
 
     /**

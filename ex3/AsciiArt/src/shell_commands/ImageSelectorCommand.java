@@ -2,8 +2,8 @@ package shell_commands;
 
 import ascii_art.AsciiArtAlgorithm;
 import exceptions.ShellCommandException;
+import image.BaseImage;
 import image.Image;
-import image.SimpleImage;
 
 import java.io.IOException;
 
@@ -35,9 +35,9 @@ public class ImageSelectorCommand implements ShellCommand {
             throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }
 
-        Image image;
+        BaseImage image;
         try {
-            image = new SimpleImage(arguments[0]);
+            image = new Image(arguments[0]);
         } catch (IOException e) {
             throw new ShellCommandException(INVALID_ARGUMENT_MESSAGE);
         }

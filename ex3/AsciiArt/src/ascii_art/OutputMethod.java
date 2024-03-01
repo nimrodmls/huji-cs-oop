@@ -5,5 +5,13 @@ package ascii_art;
  * @author Nimrod M.
  */
 public enum OutputMethod {
-    CONSOLE, HTML
+    /**
+     * The output method of the ASCII Art is the console.
+     */
+    CONSOLE,
+
+    /**
+     * The output method of the ASCII Art is HTML.
+     */
+    HTML
 }
