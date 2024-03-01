@@ -5,6 +5,10 @@ import image.PaddedImage;
 import image.SimpleImage;
 import image_char_matching.SubImgCharMatcher;
 
+/**
+ * This class is responsible for creating an ascii art representation of an image.
+ * @author Nimrod M.
+ */
 public class AsciiArtAlgorithm {
 
     private final SubImgCharMatcher charMatcher;
@@ -12,16 +16,30 @@ public class AsciiArtAlgorithm {
     private int resolution;
     private char[][] asciiArt = null;
 
+    /**
+     * Constructs a new AsciiArtAlgorithm object.
+     * @param image The image to be converted to ascii art, the image will be padded to squared dimensions
+     * @param resolution The number of sub images in each row
+     * @param charset The characters to be used in the ascii art
+     */
     public AsciiArtAlgorithm(Image image, int resolution, char[] charset) {
         destinationImage = new PaddedImage(image);
         this.resolution = resolution;
         charMatcher = new SubImgCharMatcher(charset);
     }
 
+    /**
+     * Returns the charset used in the ascii art.
+     * @return The charset used in the ascii art
+     */
     public char[] getCharset() {
         return charMatcher.getCharset();
     }
 
+    /**
+     * Adds a character to the charset used in the ascii art.
+     * @param c The character to be added to the charset
+     */
     public void addChar(char c) {
         if (charMatcher.inCharset(c)) {
             return;
@@ -32,6 +50,10 @@ public class AsciiArtAlgorithm {
         asciiArt = null;
     }
 
+    /**
+     * Removes a character from the charset used in the ascii art.
+     * @param c The character to be removed from the charset
+     */
     public void removeChar(char c) {
         if (!charMatcher.inCharset(c)) {
             return;
@@ -42,10 +64,16 @@ public class AsciiArtAlgorithm {
         asciiArt = null;
     }
 
+    /**
+     * @return The resolution of the sub images
+     */
     public int getResolution() {
         return resolution;
     }
 
+    /**
+     * @param newResolution The new resolution of the sub images
+     */
     public void setResolution(int newResolution) {
         if (newResolution == resolution) {
             return;
@@ -56,16 +84,27 @@ public class AsciiArtAlgorithm {
         asciiArt = null;
     }
 
+    /**
+     * @param newImage The new image to be converted to ascii art
+     */
     public void setImage(Image newImage) {
         destinationImage = new PaddedImage(newImage);
         // Reset the asciiArt so that it will be recalculated - There's a new image
         asciiArt = null;
     }
 
+    /**
+     * @return The image to be converted to ASCII art
+     */
     public Image getImage() {
         return destinationImage;
     }
 
+    /**
+     * Runs the algorithm and returns the ascii art representation of the image.
+     * If the ASCII art was already calculated, the cached version will be returned.
+     * @return The ASCII art representation of the image
+     */
     public char[][] run() {
         // There's a cached version of the asciiArt
         if (null != asciiArt) {

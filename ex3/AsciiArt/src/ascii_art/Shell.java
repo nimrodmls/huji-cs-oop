@@ -9,6 +9,11 @@ import shell_commands.ShellCommandFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 
+/**
+ * Shell interface for the ASCII Art program. The shell is a command line interface
+ * that allows the user to interact with the program. Multiple commands are available.
+ * @author Nimrod M.
+ */
 public class Shell {
 
     private static final String COMMAND_PROMPT_PREFIX = ">>> ";
@@ -23,6 +28,9 @@ public class Shell {
 
     private final HashMap<String, ShellCommand> commands;
 
+    /**
+     * Constructs a new Shell object with the default values for the ASCII Art program.
+     */
     public Shell() {
         SimpleImage defaultImage = null;
         try {
@@ -39,6 +47,11 @@ public class Shell {
         commands = ShellCommandFactory.createCommands(asciiArtAlgorithm, outputController);
     }
 
+    /**
+     * Runs the shell, allowing the user to interact with the program.
+     * The shell will continue to run until the user enters the exit command.
+     * The shell will print a prompt for the user to enter a command.
+     */
     public void run() {
         String userInput = null;
 

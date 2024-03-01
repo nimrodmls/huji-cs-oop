@@ -2,15 +2,35 @@ package image;
 
 import java.awt.*;
 
+/**
+ * An abstract class representing an image. Providing generic methods for image handling.
+ * @author Nimrod M.
+ */
 public abstract class Image {
     private static final double RED_GRAYSCALE_WEIGHT = 0.2126;
     private static final double GREEN_GRAYSCALE_WEIGHT = 0.7152;
     private static final double BLUE_GRAYSCALE_WEIGHT = 0.0722;
 
+    /**
+     * @return The width of the image
+     */
     public abstract int getWidth();
+
+    /**
+     * @return The height of the image
+     */
     public abstract int getHeight();
+
+    /**
+     * @param x The row coordinate of the pixel
+     * @param y The column coordinate of the pixel
+     * @return The pixel color values at the given coordinates
+     */
     public abstract Color getPixel(int x, int y);
 
+    /**
+     * @return The pixel array of the image
+     */
     public Color[][] getPixelArray() {
         Color[][] pixelArray = new Color[getHeight()][getWidth()];
         for (int i = 0; i < getHeight(); i++) {
@@ -21,6 +41,10 @@ public abstract class Image {
         return pixelArray;
     }
 
+    /**
+     * Calculates the brightness of the image.
+     * @return The brightness of the image
+     */
     public double getImageBrightness() {
         Color[][] pixelArray = getPixelArray();
         double grayscaleSum = 0;
