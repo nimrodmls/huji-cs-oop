@@ -1,0 +1,47 @@
+* Q1 - UML, Classes & Relationships
+The Shell, as intended, is the core of the whole project, it connects all the different components built for the task of generating ASCII art from an image.
+With the Shell being the core, it receives input from the user which tells it which action should take place - These actions are called 'Commands'.
+The Commands reside in the shell_commands package, with each command implementing the ShellCommand interface, enforcing a unified 'execute' method to be implemented
+by each command, allowing the Shell to handle different commands with ease, with no change within the Shell itself.
+The Shell uses the ShellCommandsFactory to create a map from command string, one which the user inserts into the Shell, to a Command object. Hence, with only addition
+of a new command implementing ShellCommand and small modification in the Factory, the Shell will be able to handle the command with no extra trouble.
+This design also allows each Command to preserve some sort of state, if needed, so that with repeated executions of the same command, the command can decide how to behave.
+Although the Shell is the core, the AsciiArtAlgorithm class is the heart of that core. It handles most of the logic in the project, and most of the commands have direct
+access to the algorithm in order to change its state according to what the user wants to do.
+
+Another choice of design in the project was the way image padding works - The padding for an image is basically a new image, but with possibly different resolution and
+the addition of the white padding pixels. For this reason, it was chosen that the padded image should have a class of its own; PaddedImage. An instance of this class
+is constructed by giving another image, and PaddedImage takes care of the rest. Due to the given Image class and PaddedImage class having some common functionality,
+since they are both presenting an image, it was decided that they should both inherit from the same interface, allowing PaddedImage to be given any sort of image which
+implements that interface. This interface was called BaseImage (due to the fact that Image must have a constructor, per the presubmit tests) - And it's not really an interface,
+but rather an abstract class. Being an abstract class, it allows us to have generic image-bound methods implemented by the abstract class, and used upon each image.
+
+A rather smaller choice of design was the way outputting the ASCII art works. With the OutputCommand being responsible of setting the output method of choice and then a
+separate command AsciiArtCommand being responsible for using the selected output method for writing the ASCII art, there had to be something in the middle communicating with both.
+One option was to have that one middle thing to be the Shell responsible for those commands, and the shell will have functionality for setting & using a output method. This choice
+was lacking, as it could've been a pandora's box for future commands to add their own functionality to the shell itself, creating a gigantic shell class.
+The alternative option, which was selected, is the OutputController class. For an instance of this class, it is possible to set the selected output method and then use it at will,
+and the instance for this class can be passed to whoever needs it. It is also possible to turn it into a Singleton, but this idea was dismissed because it was cleaner to set the
+instance for this class with the default value for the output method set in the Shell, with the rest of the default values - All being in one place.
+
+* Q2 - Usage of Java Collections & Data Structures
+The primary usage of Java Collections is within two places - SubImgCharMatcher & ShellCommandFactory. Below we will dive into the implementation details.
+
+- SubImgCharMatcher
+    An object of this class contains two TreeMap objects - One mapping between an ASCII character to a brightness value of that character, and the other mapping
+    between an ASCII character and its normalized (/ stretched) brightness value.
+
+- ShellCommandFactory
+    As described in Q1, the ShellCommandFactory creates a mapping between the Command String inserted by the user from the Shell, to a ShellCommand command.
+    This mapping is a HashMap, and the choice for this was primarily because
+    A) String is properly hashed by Java (as per the documentation)
+    B) There isn't any importance to order (we cannot predict what will the user do, nor would it change anything)
+    C) It gives comfortable and generic way for the Shell to get strings from the user and implicitly match them with a string of an actual command.
+
+    So this data structure is both efficient (with O(1) access time in average), and allows neat genericness.
+
+* Q3 - Exception Handling
+
+* Q4 - SubImgCharMatcher API modifications
+
+* Q5 - Changes in API of the Image class
