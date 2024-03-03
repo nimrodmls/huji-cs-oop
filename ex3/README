@@ -1,35 +1,31 @@
 * Q1 - UML, Classes & Relationships
 The Shell, as intended, is the core of the whole project, it connects all the different components built for the task of generating ASCII art from an image.
 With the Shell being the core, it receives input from the user which tells it which action should take place - These actions are called 'Commands'.
-The Commands reside in the shell_commands package, with each command implementing the ShellCommand interface, enforcing a unified 'execute' method to be implemented
-by each command, allowing the Shell to handle different commands with ease, with no change within the Shell itself.
-The Shell uses the ShellCommandsFactory to create a map from command string, one which the user inserts into the Shell, to a Command object. Hence, with only addition
-of a new command implementing ShellCommand and small modification in the Factory, the Shell will be able to handle the command with no extra trouble.
+The Commands reside in the shell_commands package, with each command implementing the ShellCommand interface, enforcing a unified 'execute' method to be implemented by each command, allowing the Shell to handle different commands with ease, with no change within the Shell itself.
+The Shell uses the ShellCommandsFactory to create a map from command string, one which the user inserts into the Shell, to a Command object. Hence, with only addition of a new command implementing ShellCommand and small modification in the Factory, the Shell will be able to handle the command with no extra trouble.
 This design also allows each Command to preserve some sort of state, if needed, so that with repeated executions of the same command, the command can decide how to behave.
-Although the Shell is the core, the AsciiArtAlgorithm class is the heart of that core. It handles most of the logic in the project, and most of the commands have direct
-access to the algorithm in order to change its state according to what the user wants to do.
 
-Another choice of design in the project was the way image padding works - The padding for an image is basically a new image, but with possibly different resolution and
-the addition of the white padding pixels. For this reason, it was chosen that the padded image should have a class of its own; PaddedImage. An instance of this class
-is constructed by giving another image, and PaddedImage takes care of the rest. Due to the given Image class and PaddedImage class having some common functionality,
-since they are both presenting an image, it was decided that they should both inherit from the same interface, allowing PaddedImage to be given any sort of image which
-implements that interface. This interface was called BaseImage (due to the fact that Image must have a constructor, per the presubmit tests) - And it's not really an interface,
-but rather an abstract class. Being an abstract class, it allows us to have generic image-bound methods implemented by the abstract class, and used upon each image.
+Although the Shell is the core, the AsciiArtAlgorithm class is the heart of that core. It handles most of the logic in the project, and most of the commands have direct access to the algorithm in order to change its state according to what the user wants to do. Therefore, AsciiArtAlgorithm exports functions for controlling the way ASCII generation works and behaves. Moreover, if the image for generating the art has not changed since the last generation, then the result will be cached and the algorithm will not run again.
 
-A rather smaller choice of design was the way outputting the ASCII art works. With the OutputCommand being responsible of setting the output method of choice and then a
-separate command AsciiArtCommand being responsible for using the selected output method for writing the ASCII art, there had to be something in the middle communicating with both.
-One option was to have that one middle thing to be the Shell responsible for those commands, and the shell will have functionality for setting & using a output method. This choice
-was lacking, as it could've been a pandora's box for future commands to add their own functionality to the shell itself, creating a gigantic shell class.
-The alternative option, which was selected, is the OutputController class. For an instance of this class, it is possible to set the selected output method and then use it at will,
-and the instance for this class can be passed to whoever needs it. It is also possible to turn it into a Singleton, but this idea was dismissed because it was cleaner to set the
-instance for this class with the default value for the output method set in the Shell, with the rest of the default values - All being in one place.
+Another choice of design in the project was the way image padding works - The padding for an image is basically a new image, but with possibly different resolution and the addition of the white padding pixels. For this reason, it was chosen that the padded image should have a class of its own; PaddedImage. An instance of this class is constructed by giving another image, and PaddedImage takes care of the rest. Due to the given Image class and PaddedImage class having some common functionality, since they are both representing an image, it was decided that they should both inherit from the same interface, allowing PaddedImage to be given any sort of image which implements that interface. This interface was called BaseImage (due to the fact that Image must have a constructor, per the presubmit tests) - And it's not really an interface, but rather an abstract class. Being an abstract class, it allows us to have generic image-bound methods implemented by the abstract class, and used upon each image. An important detail in the implementation of PaddedImage should be highlighted - the padding added is completely virtual and the padding pixels will not be created unless the user of the PaddedImage instance will call the getPixel method. This is unlike the Image class, which saves the entirety of the picture in a 2d array on the RAM.
+Additionaly, PaddedImage exports a getSubImages method for the exact purpose of dividing an image to subimages according to the given resolution. This method is specifically for a PaddedImage, as padded images can be divided to sub images, as they were defined in the assignment document.
+
+A rather smaller choice of design was the way outputting the ASCII art works. With the OutputCommand being responsible of setting the output method of choice and then a separate command AsciiArtCommand being responsible for using the selected output method for writing the ASCII art, there had to be something in the middle communicating with both.
+One option was to have that one middle thing to be the Shell responsible for those commands, and the shell will have functionality for setting & using a output method. This choice was lacking, as it could've been a pandora's box for future commands to add their own functionality to the shell itself, creating a gigantic shell class.
+The alternative option, which was selected, is the OutputController class. For an instance of this class, it is possible to set the selected output method and then use it at will, and the instance for this class can be passed to whoever needs it. It is also possible to turn it into a Singleton, but this idea was dismissed because it was cleaner to set the instance for this class with the default value for the output method set in the Shell, with the rest of the default values - All being in one place.
 
 * Q2 - Usage of Java Collections & Data Structures
 The primary usage of Java Collections is within two places - SubImgCharMatcher & ShellCommandFactory. Below we will dive into the implementation details.
 
 - SubImgCharMatcher
-    An object of this class contains two TreeMap objects - One mapping between an ASCII character to a brightness value of that character, and the other mapping
-    between an ASCII character and its normalized (/ stretched) brightness value.
+    An object of this class contains two TreeMap objects - One mapping between an ASCII character to a brightness value of that character, and the other mapping between an ASCII character and its normalized (/ stretched) brightness value.
+    The reason for choosing a TreeMap over any other Data Structure is because
+    A) It allows us easy mapping of characters to their brightness, therefore easy access and modification of their values on demand.
+    B) TreeMap is ordered and sorted, hence allowing us to find the first nearest-brightness character with ease.
+
+    Moreover, the Brightness Map (not the normalized!) will only be updated once per character, so when a character is added, its brightness value will only be calculated once. On the other hand, the normalized brightness values will be updated when necessary. The necessity for updating the normalized values is primarily when we added/remove a character from the charset AND the max/min brightness has changed - On that occassion, the normalized brightness will be updated, using the constant brightness values set in the first Character-Brightness map.
+
+    Most of the actions on a TreeMap are O(n log n), with n being the number of elements. The number of elements we can have in each of our TreeMaps are 256 (as the number of ASCII characters / size of byte), so n is bounded by 256.
 
 - ShellCommandFactory
     As described in Q1, the ShellCommandFactory creates a mapping between the Command String inserted by the user from the Shell, to a ShellCommand command.
@@ -41,7 +37,23 @@ The primary usage of Java Collections is within two places - SubImgCharMatcher &
     So this data structure is both efficient (with O(1) access time in average), and allows neat genericness.
 
 * Q3 - Exception Handling
+Most of the exceptions in the project are generated as a result of bad command patterns and improperly-called commands.
+That is, when a command is called with insufficient amount of arguments, or the arguments are not properly formatted, then the command will throw a ShellCommandException. This exception is a generic exception for any non-critical failure in one of the Shell commands. And the Shell will treat it that way - The Shell will catch those and only those exceptions, and so it will signal the Shell that everything is fine, the Command didn't fail because of critical system error, and running the command again & properly will work. That way, the Shell will only write the message attached to the exception and then continue receiving commands as if nothing happened.
+
+Exceptions which are not ShellCommandException will go past that catch statement in the Shell, and eventually crash the program. This behavior is okay, because in that case we've had an unexpected error which possibly signals of a bug.
+
+Furthermore, some parts of the code are covered with 'assert' statements in order to validate values passed by higher levels of the code, to make sure no bad values reach places which do not validate them.
 
 * Q4 - SubImgCharMatcher API modifications
+Most of SubImgCharMatcher remained as requested in the assignment document, with the exception of 2 new public functions:
+
+- getCharset
+The SubImgCharMatcher is viewed by the AsciiArtAlgorithm as the prime manager of the charset - It makes sure that characers are not counted twice, it handles the brightness-to-character conversion, and the addition/removal from the charset in general. As the instance which manages the charset for the algorithm, this method has been created so we can retreive the whole charset currently stored. Ultimately, this function is used for the 'chars' command.
+
+- inCharset
+Like the getCharset, this function looks up a character received as an argument in the TreeMap data structure of the brightness, which shows whether the character is within the charset or not. This function is better than looking up whether a character exists via the array returned by getCharset, since getCharset constructs an array and only then returns it, resulting in O(n) for constructing the array, and then possibly O(n) for looking up the character in the array, compared to O(log n) for lookup in the TreeMap (it's a balanced binary tree).
 
 * Q5 - Changes in API of the Image class
+As described in the sections above, first and foremost the image class now expands an abstract class 'BaseImage'. This is necessary since it places both Image and PaddedImage in one line as for the properties a image should have. The logic of the functions implemented by Image originally were not altered, and only a override directive was added. Additionaly, the BaseImage abstract class contains 2 functions which Image eventually inherits upon being an extension of BaseImage.
+One is the getImageBrightness method, which calculates the total brightness of an image, primarily used for the purpose of calculating sub image brightness. Althougth it's used for the sub images, nothing differs between an image and sub image in the class level, and it's completely in the control of the algorithm.
+The other is the getPixelArray method, which returns a 2d array representing the image.
