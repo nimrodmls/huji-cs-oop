@@ -1,0 +1,113 @@
+* Q1 - Design chosen in Part 1.7: 
+    The design I chose in for the brick layout and tracking the removal of the
+    bricks, is based on a GameObject called GridGameObject. 
+    This object, as also documented within the code, is responsible for creating 
+    a grid of GameObjects, organizing them in a grid pattern, 
+    giving each one an equal size. 
+    A particularly good feature of this object, is that it allows setting a 
+    GameObject on X-Y coordinates on a grid, rather than X-Y coordinates in pixels, 
+    which is extremely comfortable for whoever uses this class. 
+    The GridGameObject object allows 2 things: building the grid for the UI (hearts & counter)
+    and building the brick layout for the player to destroy. 
+    Focusing on the brick layout, I've created an extension for the GridGameObject called BrickGrid,
+    which assumes control over all the bricks in the game. It keeps track on how
+    many bricks remain on board, and allows interaction from the outside on removing and
+    adding bricks, and also querying the amount of bricks remaining.
+    Thus, a Brick Collision Strategy doesn't need anything else other than the brick
+    grid, and it will interact with the grid according to the strategy.
+    The getter on the remaining bricks is used by the Game Manager in order to
+    maintain the endgame validation, whereas count == 0 means the game is over.
+
+* Q2 - Design of the life counters:
+    Similarly to Q1 and as mentioned there, I built the Graphical and Textual
+    Life Counters as elements in a grid of 2x4, with the first row being for the
+    textual counter, and only one cell is used for it, and the second row is for
+    all the hearts - and as we have 4 lives max, hence the grid has 4 columns.
+    In case you wish to increase the max lives, this is easily modifiable with a
+    single constant in the game code making the change everywhere else.
+    I have created a UserInterface GameObject, which extends on the GridGameObject
+    and allows extra functionality of adding lives and removing lives. This object
+    controls all the grid, and both the textual and graphical form of lives, and by
+    calling for an increase of life, both counters will be updated.
+    But (and it's an important but!), this class DOES NOT control the behavior of
+    lives, it is merely an abstraction for the UI from the actual game logic.
+    The place where we actually control the amount of lives is the BrickerGameManager,
+    as it now exports 2 functions - addLife and removeLife, and it allows any other
+    object which receives the Game Manager to add or remove lives at will, and the
+    Game Manager will assume the rest of the control on updating the UI and checking
+    whether the game should end based on the lives counter.
+
+* Q3 - Design of each strategy (apart from Double Action):
+    - Camera Strategy:
+        The primary challenge with this strategy is counting the number of hits
+        the ball experienced before resetting the camera. With the CameraStrategy
+        class, upon a hit, the class sets the camera to follow the ball. Additionaly,
+        upon a hit a CameraController object will be created and added to the 
+        Game Manager. The CameraController object will keep track of the primary ball's
+        hit count, and will reset the camera to default upon reaching the max hit
+        count from when the CameraController has been created. When reaching the
+        necessary hit count, the Controller will remove itself from the game objects
+        and another CameraController can be created (due to the camera being null).
+            
+    - Falling Heart (Extra Life) Strategy:
+        Upon collision with a FallingHeartStrategy brick, the strategy will spawn
+        a new FallingHeart GameObject and set its velocity downwards according to the
+        requirements. The FallingHeart GameObject is quite simple - it allows the
+        collision of the user's primary paddle only, and upon collision it uses
+        the GameManager's addLife method to add a life. Note that the GameManager
+        is responsible for not going over the maximum lives, as the FallingHeart
+        should not be aware of this, and it is completely up to the GameManager to
+        decide on these matters.
+
+    - Puck Strategy:
+        Upon collision with a PuckStrategy brick, the strategy will spwan N amount
+        of puck balls, with N being a easily modifiable constant, and is set to 2
+        as per the requirements. The puck ball is simply a ball object with different
+        dimension and renderation settings, no special puck ball class has been created
+        as it has the same collision settings and most other things common with the primary ball.
+
+    - Double (/ Secondary) Paddle Strategy:
+        Do not confuse with the Double Action Strategy!
+        This strategy consists of 2 classes: DoublePaddleStrategy and DoublePaddle.
+        Upon collision with a DoublePaddleStrategy brick, the strategy will spawn
+        a DoublePaddle GameObject, only if one doesn't exist already. We check the
+        existence of another DoublePaddle with a private static counter belonging to the
+        DoublePaddleStrategy class. When a DoublePaddle object is spawned,
+        it will simply keep track of how many times it was hit, by any ball,
+        and when reaching the max (now 4) hits, it will despawn itself from the game.
+
+* Q4 - Design of the Double Action Strategy:
+    The design of the Double Action Strategy is quite simplistic - it is
+    a regular instance of a CollisionStrategy, but apart from receiving the
+    brick grid it belongs to, it also receives 2 other strategies via its
+    constructor. It will call those strategies' onCollision method when
+    its own onCollision is called, triggering the 2 other strategies.
+    Apart fromt he DoubleActionStrategy class described above, we also have
+    the StrategyFactory, which doesn't take control on the behavior of the
+    strategy but rather disallows the creation of more than 2 nested Double
+    Actions, it does so by passing a counter down a recursive chain of calls
+    to the creation of special actions within the StrategyFactory. As with other
+    constants, the amount of nested calls is also easily modifiable.
+    (2 nested means that 3 non-DoubleAction strategies are allowed, 1 in the
+    first level and 2 on the second level)
+
+* Q5 - Change of API:
+    1) BasicCollisionStrategy - Now receives a BrickGrid rather than GameManager.
+       This allows a more centeralized functionality regarding the bricks behavior,
+       including tracking the amount of bricks on the grid. Originally, the
+       GameManager was passe down, but now the BrickGrid has everything this
+       class needs in order to function properly.
+    2) BrickerGameManager - Added few new public methods
+        - addLife/removeLife, as described before.
+        - addGameObject/removeGameObject, meant for the addition and removal
+          of game objects. This is an alternative method for passing down
+          the array of game objects to whoever requires, and it is better in my
+          view because it still allows the GameManager to have complete control
+          over its game objects, so that it wouldn't allow (if needed) the
+          complete destruction and annhilation of the game objects by another
+          3rd party.
+    3) utilities package - Although it's not change of the given API, it
+       contains a class of static utility functions used around the code, and
+       another class of public static constants used around the code, in some
+       places even several times, and allows easy one-place-to-go collection
+       of constants which alter the way the game is played. 
