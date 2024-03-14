@@ -33,6 +33,7 @@ public class Sun {
         Vector2 initialSunCenter = new Vector2(
                 windowDimensions.x() / 2,
                 yCycleCenter - (windowDimensions.y() / 3));
+        sun.setCenter(initialSunCenter);
         new Transition<Float>(
                 sun,
                 (Float angle) -> sun.setCenter(
