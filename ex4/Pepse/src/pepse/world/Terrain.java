@@ -8,6 +8,7 @@ import danogl.gui.rendering.RectangleRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
+import pepse.util.GameConstants;
 
 public class Terrain {
 
@@ -18,7 +19,9 @@ public class Terrain {
     private float groundHeightAtX0;
 
     public Terrain(Vector2 windowDimensions, int seed) {
-        groundHeightAtX0 = windowDimensions.y() * (2.0f/3.0f);
+        groundHeightAtX0 = (float) Math.floor(
+                (windowDimensions.y() * GameConstants.INITIAL_GROUND_HEIGHT_FACTOR) /
+                        Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
     }
 
     public float groundHeightAt(float x) {
@@ -34,13 +37,10 @@ public class Terrain {
 
         // Creating all the blocks
         for (float x = roundMinX; x < roundMaxX; x += Block.BLOCK_SIZE) {
-            // The y value is the nearest multiple of the block size
-            float yValue =
-                    (float) Math.floor(groundHeightAt(x) / Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
             // The maximum depth
-            int maxDepth = (int)yValue + (TERRAIN_DEPTH * Block.BLOCK_SIZE);
+            int maxDepth = (int)groundHeightAt(x) + (TERRAIN_DEPTH * Block.BLOCK_SIZE);
 
-            for (float y = yValue; y < maxDepth; y += Block.BLOCK_SIZE) {
+            for (float y = groundHeightAt(x); y < maxDepth; y += Block.BLOCK_SIZE) {
                 Renderable groundRenderable = new RectangleRenderable(
                         ColorSupplier.approximateColor(BASE_GROUND_COLOR));
                 Block block = new Block(new Vector2(x, y), groundRenderable);

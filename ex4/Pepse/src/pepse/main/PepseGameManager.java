@@ -18,6 +18,7 @@ import pepse.world.Terrain;
 import pepse.world.daynight.Night;
 import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
+import pepse.world.trees.Tree;
 
 import java.awt.*;
 import java.util.List;
@@ -84,6 +85,11 @@ public class PepseGameManager extends GameManager {
                 GameConstants.ENERGY_COUNTER_SIZE,
                 energyCount);
         gameObjects().addGameObject(energyCountObject);
+
+        Tree tree = new Tree(
+                5,
+                new Vector2(60, terrain.groundHeightAt(60)),
+                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS));
     }
 
     public static void main(String[] args) {
