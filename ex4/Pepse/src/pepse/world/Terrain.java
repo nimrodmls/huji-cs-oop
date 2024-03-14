@@ -11,14 +11,14 @@ import pepse.util.ColorSupplier;
 
 public class Terrain {
 
+    private static final String TERRAN_BLOCK_TAG = "ground";
+    private static final int TERRAIN_DEPTH = 20;
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
 
     private float groundHeightAtX0;
-    private final Vector2 windowDimensions;
 
     public Terrain(Vector2 windowDimensions, int seed) {
-        groundHeightAtX0 = windowDimensions.y() * (1.0f/3.0f);
-        this.windowDimensions = windowDimensions;
+        groundHeightAtX0 = windowDimensions.y() * (2.0f/3.0f);
     }
 
     public float groundHeightAt(float x) {
@@ -26,8 +26,6 @@ public class Terrain {
     }
 
     public List<Block> createInRange(int minX, int maxX) {
-        Renderable groundRenderable = new RectangleRenderable(
-                ColorSupplier.approximateColor(BASE_GROUND_COLOR));
         List<Block> blocks = new ArrayList<>();
 
         // Round the min and max x to the nearest block size
@@ -39,8 +37,16 @@ public class Terrain {
             // The y value is the nearest multiple of the block size
             float yValue =
                     (float) Math.floor(groundHeightAt(x) / Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
-            Block block = new Block(new Vector2(x, yValue), groundRenderable);
-            blocks.add(block);
+            // The maximum depth
+            int maxDepth = (int)yValue + (TERRAIN_DEPTH * Block.BLOCK_SIZE);
+
+            for (float y = yValue; y < maxDepth; y += Block.BLOCK_SIZE) {
+                Renderable groundRenderable = new RectangleRenderable(
+                        ColorSupplier.approximateColor(BASE_GROUND_COLOR));
+                Block block = new Block(new Vector2(x, y), groundRenderable);
+                block.setTag(TERRAN_BLOCK_TAG);
+                blocks.add(block);
+            }
         }
 
         return blocks;
