@@ -80,10 +80,8 @@ public class PepseGameManager extends GameManager {
             energyCount.setString("Energy: " + avatar.getEnergy() + "%");
         }));
         GameObject energyCountObject = new GameObject(
-                new Vector2(
-                        windowDimensions.x() / 2,
-                        windowDimensions.y() - 20),
-                new Vector2(100, 20),
+                GameConstants.ENERGY_COUNTER_POS,
+                GameConstants.ENERGY_COUNTER_SIZE,
                 energyCount);
         gameObjects().addGameObject(energyCountObject);
     }
