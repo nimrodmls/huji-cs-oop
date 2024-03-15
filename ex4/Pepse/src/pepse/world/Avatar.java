@@ -56,6 +56,10 @@ public class Avatar extends GameObject {
     }
 
     public void addEnergy(int energy) {
+        if (this.energy + energy > GameConstants.AVATAR_MAX_ENERGY) {
+            this.energy = GameConstants.AVATAR_MAX_ENERGY;
+            return;
+        }
         this.energy += energy;
     }
 

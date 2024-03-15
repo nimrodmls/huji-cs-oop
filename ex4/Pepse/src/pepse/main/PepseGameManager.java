@@ -3,6 +3,7 @@ package pepse.main;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
+import danogl.components.ScheduledTask;
 import danogl.gui.ImageReader;
 import danogl.gui.SoundReader;
 import danogl.gui.UserInputListener;
@@ -28,6 +29,8 @@ public class PepseGameManager extends GameManager {
     private static final float AVATAR_CORRECTION = GameConstants.AVATAR_SIZE.x();
     private static final float DAY_NIGHT_CYCLE_SECONDS = 30.0f;
     private static final int TERRAIN_SEED = 0;
+
+    private Avatar avatar;
 
     public PepseGameManager() {
 
@@ -65,7 +68,9 @@ public class PepseGameManager extends GameManager {
         Tree tree = new Tree(
                 5,
                 new Vector2(60, terrain.groundHeightAt(60)),
-                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS));
+                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS),
+                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.DEFAULT),
+                this::fruitHandler);
 
         GameObject nightSky = Night.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
         gameObjects().addGameObject(nightSky, Layer.STATIC_OBJECTS);
@@ -77,7 +82,7 @@ public class PepseGameManager extends GameManager {
                 windowDimensions.x() - AVATAR_CORRECTION,
                 (GameConstants.INITIAL_GROUND_HEIGHT_FACTOR *
                         windowDimensions.y()) - AVATAR_CORRECTION);
-        Avatar avatar = new Avatar(avatarInitialPosition, inputListener, imageReader);
+        avatar = new Avatar(avatarInitialPosition, inputListener, imageReader);
         gameObjects().addGameObject(avatar);
 
         TextRenderable energyCount = new TextRenderable("Energy: N/A");
@@ -91,6 +96,21 @@ public class PepseGameManager extends GameManager {
                 energyCount);
         gameObjects().addGameObject(energyCountObject);
 
+    }
+
+    private void fruitHandler(GameObject fruit, GameObject other) {
+        // If the other object is not the avatar, we don't care - Only the avatar can eat the fruit
+        if (other != avatar) {
+            return;
+        }
+
+        avatar.addEnergy(10);
+        gameObjects().removeGameObject(fruit);
+        ScheduledTask fruitRespawn = new ScheduledTask(
+                avatar,
+                5.0f,
+                false,
+                () -> gameObjects().addGameObject(fruit));
     }
 
     public static void main(String[] args) {

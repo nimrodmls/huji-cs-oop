@@ -11,7 +11,9 @@ import pepse.world.Block;
 
 import java.awt.*;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.ArrayList;
 
 public class Tree {
 
@@ -26,13 +28,18 @@ public class Tree {
     private static final Color BASE_STUMP_COLOR = new Color(100, 50, 20);
     private static final Color BASE_LEAVES_COLOR = new Color(50, 200, 30);
 
-    public Tree(int stumpLength, Vector2 rootPosition, Consumer<GameObject> objectManager) {
+    public Tree(int stumpLength,
+                Vector2 rootPosition,
+                Consumer<GameObject> staticObjectManager,
+                Consumer<GameObject> interactiveObjectManager,
+                BiConsumer<GameObject, GameObject> fruitCollisionHandler) {
+
         // Creating the stump - It's essentially instances of Block in different color
         for (int i = 0; i < stumpLength; i++) {
             Block stump = new Block(
                     rootPosition.subtract(new Vector2(0, i * STUMP_LINK_SIZE)),
                     new RectangleRenderable(ColorSupplier.approximateColor(BASE_STUMP_COLOR)));
-            objectManager.accept(stump);
+            staticObjectManager.accept(stump);
         }
 
         // Creating the leaves - We create them as a square around the top link of the stump
@@ -50,7 +57,15 @@ public class Tree {
                         random.nextFloat(MIN_LEAF_SCHED_START_TIME, MAX_LEAF_SCHED_START_TIME),
                         false,
                         () -> createLeafTransitions(leaf));
-                objectManager.accept(leaf);
+                staticObjectManager.accept(leaf);
+
+                // Possibly adding a fruit to the leaf - There is 30% chance of a fruit being added
+                float randFloat = random.nextFloat(0.0f, 1.0f);
+                if (randFloat <= 0.3f) {
+                    Fruit fruit = new Fruit(pos, new Vector2(LEAF_SIZE / 2.0f, LEAF_SIZE / 2.0f), fruitCollisionHandler);
+                    fruit.setCenter(leaf.getCenter());
+                    interactiveObjectManager.accept(fruit);
+                }
             }
         }
     }
