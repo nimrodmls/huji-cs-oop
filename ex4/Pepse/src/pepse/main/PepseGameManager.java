@@ -16,6 +16,7 @@ import pepse.world.Avatar;
 import pepse.world.Block;
 import pepse.world.Sky;
 import pepse.world.Terrain;
+import pepse.world.consumables.Consumable;
 import pepse.world.daynight.Night;
 import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
@@ -98,13 +99,13 @@ public class PepseGameManager extends GameManager {
 
     }
 
-    private void fruitHandler(GameObject fruit, GameObject other) {
+    private void fruitHandler(Consumable fruit, GameObject other) {
         // If the other object is not the avatar, we don't care - Only the avatar can eat the fruit
         if (other != avatar) {
             return;
         }
 
-        avatar.addEnergy(10);
+        avatar.addEnergy(fruit.getEnergy());
         gameObjects().removeGameObject(fruit);
         ScheduledTask fruitRespawn = new ScheduledTask(
                 avatar,

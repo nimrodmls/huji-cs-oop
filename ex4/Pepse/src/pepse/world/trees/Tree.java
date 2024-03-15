@@ -4,16 +4,16 @@ import danogl.GameObject;
 import danogl.components.ScheduledTask;
 import danogl.components.Transition;
 import danogl.gui.rendering.RectangleRenderable;
-import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
 import pepse.world.Block;
+import pepse.world.consumables.Consumable;
+import pepse.world.consumables.Fruit;
 
 import java.awt.*;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.ArrayList;
 
 public class Tree {
 
@@ -32,7 +32,7 @@ public class Tree {
                 Vector2 rootPosition,
                 Consumer<GameObject> staticObjectManager,
                 Consumer<GameObject> interactiveObjectManager,
-                BiConsumer<GameObject, GameObject> fruitCollisionHandler) {
+                BiConsumer<Consumable, GameObject> fruitCollisionHandler) {
 
         // Creating the stump - It's essentially instances of Block in different color
         for (int i = 0; i < stumpLength; i++) {
