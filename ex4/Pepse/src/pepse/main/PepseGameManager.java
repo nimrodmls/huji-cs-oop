@@ -62,6 +62,11 @@ public class PepseGameManager extends GameManager {
             gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
         }
 
+        Tree tree = new Tree(
+                5,
+                new Vector2(60, terrain.groundHeightAt(60)),
+                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS));
+
         GameObject nightSky = Night.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
         gameObjects().addGameObject(nightSky, Layer.STATIC_OBJECTS);
 
@@ -86,10 +91,6 @@ public class PepseGameManager extends GameManager {
                 energyCount);
         gameObjects().addGameObject(energyCountObject);
 
-        Tree tree = new Tree(
-                5,
-                new Vector2(60, terrain.groundHeightAt(60)),
-                (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS));
     }
 
     public static void main(String[] args) {
