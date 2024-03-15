@@ -45,9 +45,6 @@ public class PepseGameManager extends GameManager {
         GameObject sky = Sky.create(windowDimensions);
         gameObjects().addGameObject(sky, Layer.BACKGROUND);
 
-        GameObject nightSky = Night.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
-        gameObjects().addGameObject(nightSky, Layer.BACKGROUND);
-
         GameObject sun = Sun.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
         GameObject sunHalo = SunHalo.create(sun);
         // Allowing the halo to move with the sun
@@ -64,6 +61,9 @@ public class PepseGameManager extends GameManager {
         for (Block block : blocks) {
             gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
         }
+
+        GameObject nightSky = Night.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
+        gameObjects().addGameObject(nightSky, Layer.STATIC_OBJECTS);
 
         // The initial position of the avatar is at the rightmost corner of the window,
         // just above the ground. The correction is due to the fact that the position given
