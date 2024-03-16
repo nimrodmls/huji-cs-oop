@@ -10,22 +10,27 @@ import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
 import pepse.util.GameConstants;
 
+import pepse.util.NoiseGenerator;
+
 public class Terrain {
 
     private static final String TERRAN_BLOCK_TAG = "ground";
     private static final int TERRAIN_DEPTH = 20;
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
+    private final NoiseGenerator noiseGenerator;
 
-    private float groundHeightAtX0;
+    private final float groundHeightAtX0;
 
-    public Terrain(Vector2 windowDimensions, int seed) {
+    public Terrain(Vector2 windowDimensions, double seed) {
         groundHeightAtX0 = (float) Math.floor(
                 (windowDimensions.y() * GameConstants.INITIAL_GROUND_HEIGHT_FACTOR) /
                         Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
+        noiseGenerator = new NoiseGenerator(seed, (int) groundHeightAtX0);
     }
 
     public float groundHeightAt(float x) {
-        return groundHeightAtX0;
+        float noise = (float) noiseGenerator.noise(x, Block.BLOCK_SIZE *7);
+        return groundHeightAtX0 + noise;
     }
 
     public List<Block> createInRange(int minX, int maxX) {
