@@ -16,6 +16,8 @@ import pepse.world.consumables.Consumable;
 import pepse.world.consumables.Fruit;
 
 public class Flora {
+    private static final float TREE_SPAWN_CHANCE = 0.3f;
+
     private final Function<Float, Float> treeRootSupplier;
     private final Consumer<GameObject> staticObjectManager;
     private final Consumer<GameObject> dynamicObjectManager;
@@ -53,8 +55,7 @@ public class Flora {
         // Creating all the trees
         Random random = new Random();
         for (float x = roundMinX; x < roundMaxX; x += (Tree.STUMP_LINK_SIZE * 3)) {
-            float treeSpawnChance = random.nextFloat();
-            if (treeSpawnChance < 0.3f) {
+            if (GameConstants.biasedCoinFlip(TREE_SPAWN_CHANCE)) {
                 float y = treeRootSupplier.apply(x);
                 Tree tree = new Tree(
                         random.nextInt(5) + 3,
@@ -73,7 +74,7 @@ public class Flora {
     private void playerJumpCallback() {
         fruitColorCycle.add(currentFruitColor);
         currentFruitColor = fruitColorCycle.remove();
-        
+
         for (Tree tree : trees) {
             tree.rotateLeaves(90.0f);
             tree.resetStumpColor();

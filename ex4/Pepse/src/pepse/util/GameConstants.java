@@ -3,6 +3,7 @@ package pepse.util;
 import danogl.util.Vector2;
 
 import java.awt.*;
+import java.util.Random;
 
 public class GameConstants {
     public static final String[] IDLE_ANIMATION_PATHS = {
@@ -39,4 +40,9 @@ public class GameConstants {
 
     public static final Color DEFAULT_FRUIT_COLOR = Color.red;
     public static final Color ALT_FRUIT_COLOR = Color.orange;
+
+    public static boolean biasedCoinFlip(float bias) {
+        Random random = new Random();
+        return random.nextFloat() < bias;
+    }
 }
