@@ -14,9 +14,11 @@ import pepse.util.Dispatcher;
 import pepse.util.GameConstants;
 import pepse.world.consumables.Consumable;
 import pepse.world.consumables.Fruit;
+import pepse.util.GameUtils;
 
 public class Flora {
     private static final float TREE_SPAWN_CHANCE = 0.3f;
+    private static final int TREE_DISTANCE = 3;
 
     private final Function<Float, Float> treeRootSupplier;
     private final Consumer<GameObject> staticObjectManager;
@@ -48,14 +50,15 @@ public class Flora {
     }
 
     public ArrayList<Tree> createInRange(int minX, int maxX) {
-        // Round the min and max x to the nearest block size
-        float roundMinX = (float) Math.floor((double) minX / Tree.STUMP_LINK_SIZE) * Tree.STUMP_LINK_SIZE;
-        float roundMaxX = (float) Math.ceil((double) maxX / Tree.STUMP_LINK_SIZE) * Tree.STUMP_LINK_SIZE;
 
-        // Creating all the trees
+        // Round the min and max x to the nearest block size
+        float roundMinX = GameUtils.lowerRoundToBlockSize(minX);
+        float roundMaxX = GameUtils.upperRoundToBlockSize(maxX);
+
         Random random = new Random();
-        for (float x = roundMinX; x < roundMaxX; x += (Tree.STUMP_LINK_SIZE * 3)) {
-            if (GameConstants.biasedCoinFlip(TREE_SPAWN_CHANCE)) {
+        // Creating all the trees - There's a chance to spawn a tree every TREE_DISTANCE blocks
+        for (float x = roundMinX; x < roundMaxX; x += (Tree.STUMP_LINK_SIZE * TREE_DISTANCE)) {
+            if (GameUtils.biasedCoinFlip(TREE_SPAWN_CHANCE)) {
                 float y = treeRootSupplier.apply(x);
                 Tree tree = new Tree(
                         random.nextInt(5) + 3,
@@ -79,8 +82,8 @@ public class Flora {
             tree.rotateLeaves(90.0f);
             tree.resetStumpColor();
 
-            for (Fruit frt : tree.getFruits()) {
-                frt.setColor(currentFruitColor);
+            for (Fruit fruit : tree.getFruits()) {
+                fruit.setColor(currentFruitColor);
             }
         }
 

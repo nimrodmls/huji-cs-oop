@@ -1,21 +1,22 @@
 package pepse.world.trees;
 
-import danogl.GameObject;
-import danogl.components.ScheduledTask;
-import danogl.components.Transition;
-import danogl.gui.rendering.RectangleRenderable;
-import danogl.util.Vector2;
-import pepse.util.ColorSupplier;
-import pepse.util.GameConstants;
-import pepse.world.Block;
-import pepse.world.consumables.Consumable;
-import pepse.world.consumables.Fruit;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import danogl.GameObject;
+import danogl.components.ScheduledTask;
+import danogl.components.Transition;
+import danogl.gui.rendering.RectangleRenderable;
+import danogl.util.Vector2;
+
+import pepse.util.ColorSupplier;
+import pepse.world.Block;
+import pepse.world.consumables.Consumable;
+import pepse.world.consumables.Fruit;
+import pepse.util.GameUtils;
 
 public class Tree {
 
@@ -121,7 +122,7 @@ public class Tree {
             for (int col = -(LEAVES_DIMENSION / 2); col < (LEAVES_DIMENSION / 2) + 1; col++) {
 
                 // There is a 70% chance of a leaf being created
-                if (GameConstants.biasedCoinFlip(1.0f - LEAF_SPAWN_CHANCE)) {
+                if (GameUtils.biasedCoinFlip(1.0f - LEAF_SPAWN_CHANCE)) {
                     continue;
                 }
 
@@ -137,7 +138,7 @@ public class Tree {
                 leaves.add(leaf);
 
                 // Possibly adding a fruit to the leaf - There is 30% chance of a fruit being added
-                if (GameConstants.biasedCoinFlip(FRUIT_SPAWN_CHANCE)) {
+                if (GameUtils.biasedCoinFlip(FRUIT_SPAWN_CHANCE)) {
                     Fruit fruit = createFruitObject(
                             leaf.getCenter(),
                             fruitColor,

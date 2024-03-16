@@ -10,6 +10,7 @@ import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
 import pepse.util.GameConstants;
 
+import pepse.util.GameUtils;
 import pepse.util.NoiseGenerator;
 
 public class Terrain {
@@ -38,8 +39,8 @@ public class Terrain {
         List<Block> blocks = new ArrayList<>();
 
         // Round the min and max x to the nearest block size
-        float roundMinX = (float) Math.floor((double) minX / Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
-        float roundMaxX = (float) Math.ceil((double) maxX / Block.BLOCK_SIZE) * Block.BLOCK_SIZE;
+        float roundMinX = GameUtils.lowerRoundToBlockSize(minX);
+        float roundMaxX = GameUtils.upperRoundToBlockSize(maxX);
 
         // Creating all the blocks
         for (float x = roundMinX; x < roundMaxX; x += Block.BLOCK_SIZE) {

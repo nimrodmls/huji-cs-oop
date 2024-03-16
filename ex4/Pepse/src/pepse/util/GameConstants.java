@@ -53,9 +53,4 @@ public class GameConstants {
     public static final Color DEFAULT_FRUIT_COLOR = Color.red;
     public static final Color ALT_FRUIT_COLOR = Color.orange;
     public static final float FRUIT_RESPAWN_DELAY_SECONDS = 30.f;
-
-    public static boolean biasedCoinFlip(float bias) {
-        Random random = new Random();
-        return random.nextFloat() < bias;
-    }
 }
