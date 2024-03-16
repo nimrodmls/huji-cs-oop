@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.Random;
 
 public class GameConstants {
+    // Animation-related constants
     public static final String[] IDLE_ANIMATION_PATHS = {
             "assets/idle_0.png",
             "assets/idle_1.png",
@@ -26,20 +27,32 @@ public class GameConstants {
             "assets/run_4.png",
             "assets/run_5.png"
     };
-    
+
+    // World-related constants
+
+    public static final float WORLD_GRAVITY = 600;
     public static final float INITIAL_GROUND_HEIGHT_FACTOR = 2.0f/3.0f;
+
+    // UI-related constants
+
     public static final Vector2 ENERGY_COUNTER_SIZE = new Vector2(100, 20);
     public static final Vector2 ENERGY_COUNTER_POS = new Vector2(50, 50);
+    public static final String ENERGY_COUNTER_TEXT_PREFIX = "Energy: ";
 
-    public static final float GRAVITY = 600;
+
+    // Avatar-related constants
+
     public static final Vector2 AVATAR_SIZE = new Vector2(50, 50);
     public static final float AVATAR_MAX_ENERGY = 100.0f;
     public static final float AVATAR_MOVE_ENERGY_COST = 0.5f;
     public static final float AVATAR_JUMP_ENERGY_COST = 10.0f;
     public static final String AVATAR_JUMP_EVENT = "avatarJump";
 
+    // Flora-related constants
+
     public static final Color DEFAULT_FRUIT_COLOR = Color.red;
     public static final Color ALT_FRUIT_COLOR = Color.orange;
+    public static final float FRUIT_RESPAWN_DELAY_SECONDS = 30.f;
 
     public static boolean biasedCoinFlip(float bias) {
         Random random = new Random();

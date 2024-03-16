@@ -17,8 +17,9 @@ public class Terrain {
     private static final String TERRAN_BLOCK_TAG = "ground";
     private static final int TERRAIN_DEPTH = 20;
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
-    private final NoiseGenerator noiseGenerator;
+    private static final double NOISE_FACTOR = Block.BLOCK_SIZE * 7;
 
+    private final NoiseGenerator noiseGenerator;
     private final float groundHeightAtX0;
 
     public Terrain(Vector2 windowDimensions, double seed) {
@@ -29,7 +30,7 @@ public class Terrain {
     }
 
     public float groundHeightAt(float x) {
-        float noise = (float) noiseGenerator.noise(x, Block.BLOCK_SIZE *7);
+        float noise = (float) noiseGenerator.noise(x, NOISE_FACTOR);
         return groundHeightAtX0 + noise;
     }
 

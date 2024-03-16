@@ -54,7 +54,21 @@ public class PepseGameManager extends GameManager {
 
         eventDispatcher = new Dispatcher();
 
+        // Creating all game objects, the order matters.
+        createSkyline(windowDimensions);
+        Terrain terrain = createTerrain(windowDimensions);
+        createAvatar(windowDimensions, inputListener, imageReader);
+        createFlora(windowDimensions, terrain, eventDispatcher);
 
+        // The night sky is created in front of all GAME objects
+        createNightSky(windowDimensions);
+
+        // The UI is created in front of everything, shouldn't be affected by night/day cycle
+        createUI(avatar);
+
+    }
+
+    private void createSkyline(Vector2 windowDimensions) {
         GameObject sky = Sky.create(windowDimensions);
         gameObjects().addGameObject(sky, Layer.BACKGROUND);
 
@@ -68,13 +82,20 @@ public class PepseGameManager extends GameManager {
         // The sun is in front of the halo - order is important
         gameObjects().addGameObject(sunHalo, Layer.BACKGROUND);
         gameObjects().addGameObject(sun, Layer.BACKGROUND);
+    }
 
+    private Terrain createTerrain(Vector2 windowDimensions) {
         Terrain terrain = new Terrain(windowDimensions, TERRAIN_SEED);
         List<Block> blocks = terrain.createInRange(0, (int)windowDimensions.x());
         for (Block block : blocks) {
             gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
         }
+        return terrain;
+    }
 
+    private void createAvatar(Vector2 windowDimensions,
+                              UserInputListener inputListener,
+                              ImageReader imageReader) {
         // The initial position of the avatar is at the rightmost corner of the window,
         // just above the ground. The correction is due to the fact that the position given
         // is for the top left corner of the avatar, and we need it above ground & within the window.
@@ -84,7 +105,11 @@ public class PepseGameManager extends GameManager {
                         windowDimensions.y()) - AVATAR_CORRECTION);
         avatar = new Avatar(avatarInitialPosition, inputListener, imageReader, eventDispatcher);
         gameObjects().addGameObject(avatar);
+    }
 
+    private void createFlora(Vector2 windowDimensions,
+                             Terrain terrain,
+                             Dispatcher eventDispatcher) {
         Flora flora = new Flora(
                 terrain::groundHeightAt,
                 (GameObject obj) -> gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS),
@@ -92,21 +117,25 @@ public class PepseGameManager extends GameManager {
                 this::fruitHandler,
                 eventDispatcher);
         flora.createInRange(0, (int)windowDimensions.x());
+    }
 
+    private void createNightSky(Vector2 windowDimensions) {
         GameObject nightSky = Night.create(windowDimensions, DAY_NIGHT_CYCLE_SECONDS);
         gameObjects().addGameObject(nightSky, Layer.STATIC_OBJECTS);
+    }
 
-        TextRenderable energyCount = new TextRenderable("Energy: N/A");
+    private void createUI(Avatar avatar) {
+        TextRenderable energyCount = new TextRenderable(GameConstants.ENERGY_COUNTER_TEXT_PREFIX);
         energyCount.setColor(Color.BLACK);
+        // Upon updating the character, we update the energy count
         avatar.addComponent((deltaTime -> {
-            energyCount.setString("Energy: " + avatar.getEnergy() + "%");
+            energyCount.setString(GameConstants.ENERGY_COUNTER_TEXT_PREFIX + avatar.getEnergy());
         }));
         GameObject energyCountObject = new GameObject(
                 GameConstants.ENERGY_COUNTER_POS,
                 GameConstants.ENERGY_COUNTER_SIZE,
                 energyCount);
         gameObjects().addGameObject(energyCountObject);
-
     }
 
     private void fruitHandler(Consumable fruit, GameObject other) {
@@ -119,7 +148,7 @@ public class PepseGameManager extends GameManager {
         gameObjects().removeGameObject(fruit);
         ScheduledTask fruitRespawn = new ScheduledTask(
                 avatar,
-                5.0f,
+                GameConstants.FRUIT_RESPAWN_DELAY_SECONDS,
                 false,
                 () -> gameObjects().addGameObject(fruit));
     }

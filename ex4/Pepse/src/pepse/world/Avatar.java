@@ -13,20 +13,23 @@ import java.awt.event.KeyEvent;
 public class Avatar extends GameObject {
     private static final float VELOCITY_X = 400;
     private static final float VELOCITY_Y = -650;
+    private static final float ANIMATION_CLIP_DURATION = 0.5f;
 
-    private final AnimationRenderable avatarIdleAnimation;
-    private final AnimationRenderable avatarJumpAnimation;
-    private final AnimationRenderable avatarRunAnimation;
+    private AnimationRenderable avatarIdleAnimation;
+    private AnimationRenderable avatarJumpAnimation;
+    private AnimationRenderable avatarRunAnimation;
     private final UserInputListener inputListener;
     private final Dispatcher dispatcher;
     private float energy = GameConstants.AVATAR_MAX_ENERGY;
 
-    public Avatar(Vector2 pos,
+    public Avatar(Vector2 startPosition,
                   UserInputListener inputListener,
                   ImageReader imageReader,
                   Dispatcher dispatcher) {
+        // It doesn't matter which renderable we pass here, it will be replaced by the idle animation
+        // once initialized
         super(
-            pos,
+            startPosition,
             GameConstants.AVATAR_SIZE,
             imageReader.readImage(GameConstants.IDLE_ANIMATION_PATHS[0], true)
         );
@@ -35,28 +38,15 @@ public class Avatar extends GameObject {
         this.inputListener = inputListener;
 
         physics().preventIntersectionsFromDirection(Vector2.ZERO);
-        transform().setAccelerationY(GameConstants.GRAVITY);
+        transform().setAccelerationY(GameConstants.WORLD_GRAVITY);
 
         // Initializing the animation renderers once!
-        avatarIdleAnimation = new AnimationRenderable(
-                GameConstants.IDLE_ANIMATION_PATHS,
-                imageReader,
-                true,
-                0.5f);
+        initializeAnimations(imageReader);
 
-        avatarRunAnimation = new AnimationRenderable(
-                GameConstants.RUN_ANIMATION_PATHS,
-                imageReader,
-                true,
-                0.5f);
-
-        avatarJumpAnimation = new AnimationRenderable(
-                GameConstants.JUMP_ANIMATION_PATHS,
-                imageReader,
-                true,
-                0.5f);
-
+        // The avatar is initialized as idle
         renderer().setRenderable(avatarIdleAnimation);
+
+        // Creating the jump event, it will be triggered when the avatar jumps
         dispatcher.createEvent(GameConstants.AVATAR_JUMP_EVENT);
     }
 
@@ -75,11 +65,11 @@ public class Avatar extends GameObject {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        float xVel = 0;
+        float xVelocity = 0;
 
         if (inputListener.isKeyPressed(KeyEvent.VK_LEFT)) {
             if (consumeEnergy(GameConstants.AVATAR_MOVE_ENERGY_COST)) {
-                xVel -= VELOCITY_X;
+                xVelocity -= VELOCITY_X;
                 renderer().setRenderable(avatarRunAnimation);
                 renderer().setIsFlippedHorizontally(true);
             }
@@ -87,13 +77,13 @@ public class Avatar extends GameObject {
 
         if(inputListener.isKeyPressed(KeyEvent.VK_RIGHT)) {
             if (consumeEnergy(GameConstants.AVATAR_MOVE_ENERGY_COST)) {
-                xVel += VELOCITY_X;
+                xVelocity += VELOCITY_X;
                 renderer().setRenderable(avatarRunAnimation);
                 renderer().setIsFlippedHorizontally(false);
             }
         }
 
-        transform().setVelocityX(xVel);
+        transform().setVelocityX(xVelocity);
         if(inputListener.isKeyPressed(KeyEvent.VK_SPACE) && getVelocity().y() == 0) {
             if (consumeEnergy(GameConstants.AVATAR_JUMP_ENERGY_COST)) {
                 transform().setVelocityY(VELOCITY_Y);
@@ -118,5 +108,25 @@ public class Avatar extends GameObject {
             return true;
         }
         return false;
+    }
+
+    private void initializeAnimations(ImageReader imageReader) {
+        avatarIdleAnimation = new AnimationRenderable(
+                GameConstants.IDLE_ANIMATION_PATHS,
+                imageReader,
+                true,
+                ANIMATION_CLIP_DURATION);
+
+        avatarRunAnimation = new AnimationRenderable(
+                GameConstants.RUN_ANIMATION_PATHS,
+                imageReader,
+                true,
+                ANIMATION_CLIP_DURATION);
+
+        avatarJumpAnimation = new AnimationRenderable(
+                GameConstants.JUMP_ANIMATION_PATHS,
+                imageReader,
+                true,
+                ANIMATION_CLIP_DURATION);
     }
 }

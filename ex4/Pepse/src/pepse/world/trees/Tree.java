@@ -29,8 +29,12 @@ public class Tree {
     private static final float MIN_LEAF_SCHED_START_TIME = 0.0f;
     private static final float MAX_LEAF_SCHED_START_TIME = 3.0f;
     private static final float LEAF_SPAWN_CHANCE = 0.7f;
+    private static final float FRUIT_SPAWN_CHANCE = 0.3f;
     private static final Color BASE_STUMP_COLOR = new Color(100, 50, 20);
     private static final Color BASE_LEAVES_COLOR = new Color(50, 200, 30);
+    private static final String LEAF_TAG = "leaf";
+    private static final String FRUIT_TAG = "fruit";
+    private static final String STUMP_TAG = "stump";
 
     private boolean inRotation = false;
     private final GameObject[] stumpLinks;
@@ -45,20 +49,16 @@ public class Tree {
                 Consumer<GameObject> interactiveObjectManager,
                 BiConsumer<Consumable, GameObject> fruitCollisionHandler) {
 
-        stumpLinks = new GameObject[stumpLength];
         // Creating the stump - It's essentially instances of Block in different color
-        for (int i = 0; i < stumpLength; i++) {
-            Block stump = new Block(
-                    rootPosition.subtract(new Vector2(0, i * STUMP_LINK_SIZE)),
-                    new RectangleRenderable(ColorSupplier.approximateColor(BASE_STUMP_COLOR)));
-            staticObjectManager.accept(stump);
-            stumpLinks[i] = stump;
-        }
+        // The amount of stump links is constant and determined by the stump length
+        stumpLinks = new GameObject[stumpLength];
+        createStump(stumpLength, rootPosition, staticObjectManager);
 
+        // The amount of fruits and leaves is not known in advance, so we use ArrayList
         leaves = new ArrayList<>();
         fruits = new ArrayList<>();
-
         // Creating the leaves - We create them as a square around the top link of the stump
+        // each leaf has a chance of having a fruit
         createLeaves(
                 rootPosition,
                 stumpLength,
@@ -111,21 +111,23 @@ public class Tree {
             Consumer<GameObject> staticObjectManager,
             Consumer<GameObject> interactiveObjectManager,
             BiConsumer<Consumable, GameObject> fruitCollisionHandler) {
+
         Random random = new Random();
+        // Calculating where the stump of the tree ends
         Vector2 topLinkPos = rootPosition.subtract(new Vector2(0, stumpLength * STUMP_LINK_SIZE));
-        for (int i = -(LEAVES_DIMENSION / 2); i < (LEAVES_DIMENSION / 2) + 1; i++) {
-            for (int j = -(LEAVES_DIMENSION / 2); j < (LEAVES_DIMENSION / 2) + 1; j++) {
+
+        // Creating all the leaves - The leaves are a square around the top link of the stump
+        for (int row = -(LEAVES_DIMENSION / 2); row < (LEAVES_DIMENSION / 2) + 1; row++) {
+            for (int col = -(LEAVES_DIMENSION / 2); col < (LEAVES_DIMENSION / 2) + 1; col++) {
 
                 // There is a 70% chance of a leaf being created
                 if (GameConstants.biasedCoinFlip(1.0f - LEAF_SPAWN_CHANCE)) {
                     continue;
                 }
 
-                Vector2 pos = topLinkPos.add(new Vector2(i * LEAF_SIZE, j * LEAF_SIZE));
-                GameObject leaf = new GameObject(
-                        pos,
-                        new Vector2(LEAF_SIZE, LEAF_SIZE),
-                        new RectangleRenderable(ColorSupplier.approximateColor(BASE_LEAVES_COLOR)));
+                Vector2 pos = topLinkPos.add(new Vector2(row * LEAF_SIZE, col * LEAF_SIZE));
+                GameObject leaf = createLeafObject(pos);
+                // The leaf's movement is delayed by a random amount of time
                 new ScheduledTask(
                         leaf,
                         random.nextFloat(MIN_LEAF_SCHED_START_TIME, MAX_LEAF_SCHED_START_TIME),
@@ -135,10 +137,9 @@ public class Tree {
                 leaves.add(leaf);
 
                 // Possibly adding a fruit to the leaf - There is 30% chance of a fruit being added
-                if (GameConstants.biasedCoinFlip(0.3f)) {
-                    Fruit fruit = new Fruit(
-                            pos,
-                            FRUIT_DIM,
+                if (GameConstants.biasedCoinFlip(FRUIT_SPAWN_CHANCE)) {
+                    Fruit fruit = createFruitObject(
+                            leaf.getCenter(),
                             fruitColor,
                             fruitCollisionHandler);
                     fruit.setCenter(leaf.getCenter());
@@ -146,6 +147,17 @@ public class Tree {
                     fruits.add(fruit);
                 }
             }
+        }
+    }
+
+    private void createStump(int stumpLength, Vector2 rootPosition, Consumer<GameObject> staticObjectManager) {
+        for (int i = 0; i < stumpLength; i++) {
+            Block stump = new Block(
+                    rootPosition.subtract(new Vector2(0, i * STUMP_LINK_SIZE)),
+                    new RectangleRenderable(ColorSupplier.approximateColor(BASE_STUMP_COLOR)));
+            staticObjectManager.accept(stump);
+            stumpLinks[i] = stump;
+            stump.setTag(STUMP_TAG);
         }
     }
 
@@ -170,5 +182,26 @@ public class Tree {
                 random.nextFloat(MIN_LEAF_CYCLE_LENGTH, MAX_LEAF_CYCLE_LENGTH),
                 Transition.TransitionType.TRANSITION_BACK_AND_FORTH,
                 null);
+    }
+
+    private static GameObject createLeafObject(Vector2 position) {
+        GameObject leaf = new GameObject(
+                position,
+                new Vector2(LEAF_SIZE, LEAF_SIZE),
+                new RectangleRenderable(ColorSupplier.approximateColor(BASE_LEAVES_COLOR)));
+        leaf.setTag(LEAF_TAG);
+        return leaf;
+    }
+
+    private static Fruit createFruitObject(Vector2 position,
+                                           Color fruitColor,
+                                           BiConsumer<Consumable, GameObject> fruitCollisionHandler) {
+        Fruit fruit = new Fruit(
+                position,
+                FRUIT_DIM,
+                fruitColor,
+                fruitCollisionHandler);
+        fruit.setTag(FRUIT_TAG);
+        return fruit;
     }
 }

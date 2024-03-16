@@ -10,12 +10,13 @@ import java.awt.*;
 public class SunHalo {
     private static final Color HALO_COLOR = new Color(255, 255, 0, 20);
     private static final String sunHaloTag = "sunHalo";
+    private static final float HALO_SIZE_FACTOR = 1.5f;
 
     public static GameObject create(GameObject sun) {
         GameObject sunHalo = new GameObject(
                 sun.getTopLeftCorner(),
                 // The halo's size is 1.5 times the sun's size
-                sun.getDimensions().mult(1.5f),
+                sun.getDimensions().mult(HALO_SIZE_FACTOR),
                 new OvalRenderable(HALO_COLOR));
         // Setting the sun to move with the camera
         sunHalo.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
