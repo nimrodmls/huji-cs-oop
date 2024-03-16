@@ -6,18 +6,20 @@ import danogl.components.Transition;
 import danogl.gui.rendering.RectangleRenderable;
 import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
+import pepse.util.GameConstants;
 import pepse.world.Block;
 import pepse.world.consumables.Consumable;
 import pepse.world.consumables.Fruit;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Tree {
 
-    private static final int STUMP_LINK_SIZE = 30;
+    public static final int STUMP_LINK_SIZE = Block.BLOCK_SIZE;
     private static final int LEAF_SIZE = 30;
     // Determines the size of the square of leaves around the top link of the stump
     private static final int LEAVES_DIMENSION = 5;
@@ -28,19 +30,31 @@ public class Tree {
     private static final Color BASE_STUMP_COLOR = new Color(100, 50, 20);
     private static final Color BASE_LEAVES_COLOR = new Color(50, 200, 30);
 
+    private boolean inRotation = false;
+    private final GameObject[] stumpLinks;
+    private final GameObject[][] leaves;
+    // The fruits on the tree, it's of dynamic size since it's not known in advance
+    private final ArrayList<Fruit> fruits;
+
     public Tree(int stumpLength,
                 Vector2 rootPosition,
+                Color fruitColor,
                 Consumer<GameObject> staticObjectManager,
                 Consumer<GameObject> interactiveObjectManager,
                 BiConsumer<Consumable, GameObject> fruitCollisionHandler) {
 
+        stumpLinks = new GameObject[stumpLength];
         // Creating the stump - It's essentially instances of Block in different color
         for (int i = 0; i < stumpLength; i++) {
             Block stump = new Block(
                     rootPosition.subtract(new Vector2(0, i * STUMP_LINK_SIZE)),
                     new RectangleRenderable(ColorSupplier.approximateColor(BASE_STUMP_COLOR)));
             staticObjectManager.accept(stump);
+            stumpLinks[i] = stump;
         }
+
+        leaves = new GameObject[LEAVES_DIMENSION][LEAVES_DIMENSION];
+        fruits = new ArrayList<>();
 
         // Creating the leaves - We create them as a square around the top link of the stump
         Random random = new Random();
@@ -58,26 +72,70 @@ public class Tree {
                         false,
                         () -> createLeafTransitions(leaf));
                 staticObjectManager.accept(leaf);
+                leaves[i + (LEAVES_DIMENSION / 2)][j + (LEAVES_DIMENSION / 2)] = leaf;
 
                 // Possibly adding a fruit to the leaf - There is 30% chance of a fruit being added
                 float randFloat = random.nextFloat(0.0f, 1.0f);
                 if (randFloat <= 0.3f) {
-                    Fruit fruit = new Fruit(pos, new Vector2(LEAF_SIZE / 2.0f, LEAF_SIZE / 2.0f), fruitCollisionHandler);
+                    Fruit fruit = new Fruit(
+                            pos,
+                            new Vector2(LEAF_SIZE / 2.0f, LEAF_SIZE / 2.0f),
+                            fruitColor,
+                            fruitCollisionHandler);
                     fruit.setCenter(leaf.getCenter());
                     interactiveObjectManager.accept(fruit);
+                    fruits.add(fruit);
                 }
             }
         }
     }
 
+    public ArrayList<Fruit> getFruits() {
+        return fruits;
+    }
+
+    public void resetStumpColor() {
+        for (GameObject stumpLink : stumpLinks) {
+            stumpLink.renderer().setRenderable(
+                    new RectangleRenderable(ColorSupplier.approximateColor(BASE_STUMP_COLOR)));
+        }
+    }
+
+    public void rotateLeaves(float rotationAngle) {
+        for (GameObject[] leafRow : leaves) {
+            for (GameObject leaf : leafRow) {
+                inRotation = true;
+                new Transition<Float>(
+                        leaf,
+                        (Float angle) -> leaf.renderer().setRenderableAngle(angle),
+                        leaf.renderer().getRenderableAngle(),
+                        leaf.renderer().getRenderableAngle() + rotationAngle,
+                        Transition.LINEAR_INTERPOLATOR_FLOAT,
+                        1.0f,
+                        Transition.TransitionType.TRANSITION_ONCE,
+                        () -> inRotation = false);
+            }
+        }
+    }
+
+    private void leafIdleRotationCallback(GameObject leaf, float angle) {
+        // If the leaf is currently being rotated, the angle is not changed,
+        // it will be changed once the leaf is gone idle
+        if (inRotation) {
+            return;
+        }
+
+        leaf.renderer().setRenderableAngle(angle);
+    }
+
     // Associates the given leaf with the super realistic moving transitions
-    private static void createLeafTransitions(GameObject leaf) {
+    private void createLeafTransitions(GameObject leaf) {
         Random random = new Random();
         new Transition<Float>(
                 leaf,
-                (Float angle) -> leaf.renderer().setRenderableAngle(angle),
+                (Float angle) -> leafIdleRotationCallback(leaf, angle),
                 0.0f,
-                360.0f,
+                60.0f,
                 Transition.LINEAR_INTERPOLATOR_FLOAT,
                 random.nextFloat(MIN_LEAF_CYCLE_LENGTH, MAX_LEAF_CYCLE_LENGTH),
                 Transition.TransitionType.TRANSITION_BACK_AND_FORTH,

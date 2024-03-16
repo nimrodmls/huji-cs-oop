@@ -5,6 +5,7 @@ import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.AnimationRenderable;
 import danogl.util.Vector2;
+import pepse.util.Dispatcher;
 import pepse.util.GameConstants;
 
 import java.awt.event.KeyEvent;
@@ -17,17 +18,24 @@ public class Avatar extends GameObject {
     private final AnimationRenderable avatarJumpAnimation;
     private final AnimationRenderable avatarRunAnimation;
     private final UserInputListener inputListener;
+    private final Dispatcher dispatcher;
     private float energy = GameConstants.AVATAR_MAX_ENERGY;
 
-    public Avatar(Vector2 pos, UserInputListener inputListener, ImageReader imageReader) {
+    public Avatar(Vector2 pos,
+                  UserInputListener inputListener,
+                  ImageReader imageReader,
+                  Dispatcher dispatcher) {
         super(
             pos,
             GameConstants.AVATAR_SIZE,
             imageReader.readImage(GameConstants.IDLE_ANIMATION_PATHS[0], true)
         );
+
+        this.dispatcher = dispatcher;
+        this.inputListener = inputListener;
+
         physics().preventIntersectionsFromDirection(Vector2.ZERO);
         transform().setAccelerationY(GameConstants.GRAVITY);
-        this.inputListener = inputListener;
 
         // Initializing the animation renderers once!
         avatarIdleAnimation = new AnimationRenderable(
@@ -49,6 +57,7 @@ public class Avatar extends GameObject {
                 0.5f);
 
         renderer().setRenderable(avatarIdleAnimation);
+        dispatcher.createEvent(GameConstants.AVATAR_JUMP_EVENT);
     }
 
     public float getEnergy() {
@@ -89,6 +98,8 @@ public class Avatar extends GameObject {
             if (consumeEnergy(GameConstants.AVATAR_JUMP_ENERGY_COST)) {
                 transform().setVelocityY(VELOCITY_Y);
                 renderer().setRenderable(avatarJumpAnimation);
+                // Notifying the dispatcher that jump has occurred
+                dispatcher.setEvent(GameConstants.AVATAR_JUMP_EVENT);
             }
         }
 

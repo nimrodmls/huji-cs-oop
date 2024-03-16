@@ -2,6 +2,8 @@ package pepse.util;
 
 import danogl.util.Vector2;
 
+import java.awt.*;
+
 public class GameConstants {
     public static final String[] IDLE_ANIMATION_PATHS = {
             "assets/idle_0.png",
@@ -33,4 +35,8 @@ public class GameConstants {
     public static final float AVATAR_MAX_ENERGY = 100.0f;
     public static final float AVATAR_MOVE_ENERGY_COST = 0.5f;
     public static final float AVATAR_JUMP_ENERGY_COST = 10.0f;
+    public static final String AVATAR_JUMP_EVENT = "avatarJump";
+
+    public static final Color DEFAULT_FRUIT_COLOR = Color.red;
+    public static final Color ALT_FRUIT_COLOR = Color.orange;
 }
