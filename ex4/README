@@ -1,0 +1,85 @@
+
+# Structure Overview of Flora handling
+The Flora handling is divided into several classes:
+- Flora: The main class which creates all the flora in the game and bridges between
+         the game and the generic flora objects.
+- Tree: Generic class representing a tree.
+- Consumable: Abstract class representing a consumable in the game, it's not
+              necessarily a flora, but in our case the only consumable is a fruit,
+              so we consider it part of the Flora of the game (although we consider
+              it that way, but there is no actual relation between the flora and
+              the fruit).
+- Fruit: A consumable fruit which grows on a tree.
+- Dispatcher: An observer-type class which is responsible notifying
+              game objects about different events in the game. It is primarily
+              used for the jump notification.
+
+All the classes which weren't mentioned here, are part of the general design and
+guidance provided in the assignment.
+Below we will delve into the details of the design and implementation of the
+classes.
+
+# Consumables
+The Consumable class is an abstract class which represents a consumable in the game.
+Consumables in this game are very basic at this stage, so they only have
+an energy property, which should be set by the derived class. Moreover, the 
+consumable can be set with a callback to be called when the consumable is collided.
+That callback can determine the effect of the consumable on the player, for example.
+Our only consumable in the game is the Fruit, and is set with a constant energy
+value, as defined in the assignment.
+
+# Tree construction & interaction
+A tree's creation is made entirely within the Tree class. Given a root position
+in the game window, the Tree's constructor creates the tree's stump, leaves and
+fruits (it's essentially viewed as a Fruit Tree, so if we were to add more Tree
+types to the game, we'd removed the Fruit creation logic and inherit from the base
+tree). The tree's stump is built of multiple Block links of the same size, and
+the leaves are built as regular rectangle renderables (so they can be passed
+through, unlike the stump which is "concrete"). The fruits are created as
+Fruit objects and are placed on the leaves of the tree, though they are separate objects.
+On creation of the leaves, the Tree initializes them with basic transitions of idle rotation,
+and slight change in the leaf's dimensions.
+Along with the creation of the tree, the Tree class has functionality for interaction
+and manipulation of the tree - for example, the leaves of the tree can be rotated, 
+the colors of the stump can be changed, and more.
+An important thing to note about the tree is that it is essentially composed
+of a lot of game objects - The fruits, the leaves and the stump. So, the tree
+should have a way to add all those objects to the game. For better design,
+the tree receives 2 callbacks, one for adding static game objects (stump and leaves)
+adn one for adding dynamic game objects (fruits). This way, the tree can be
+responsible from start to finish of the objects it requires. Although it won't
+gain total control over the game's objects, but it will be limited by the callback.
+(unlike Ex2 where there the array of game objects from the Game Manager was passed
+in some manner, thus theoretically handing total control).
+
+# The Dispatcher
+The Dispatcher class is a simple observer-type class which is responsible for
+notifying game objects about different events in the game. As an observer,
+it is possible to create new events and let other objects subscribe to them.
+Upon subscription, the subscriber will be notified when the event is triggered.
+This is the primary way the game allows for the jump notification to occur, with
+the Flora class being the bridge between the rest of the game and the Trees,
+we register a new callback for the jump event in the Flora class, and when the
+jump event is triggered, the Flora class will then execute a series of actions
+on the trees it's responsible for. This series of actions is what the assignment
+asks for - Rotation of the leaves by 90 degrees, and a change in the color of the
+stump and the change of fruit color.
+
+# Conclusion
+The general relationship of all the classes above are as follows:
+1) The PepseGameManager creates the Flora class, it passes the Dispatcher to it.
+2) The PepseGameManager uses the created Flora to create the trees in the game.
+3) The Flora creates the trees in a random manner and registers the jump event
+   callback to the Dispatcher.
+4) Each Tree created by Flora is created with a set of leaves (random amount) and
+   fruits (random amount). A fruit is attached to a leaf, so if a leaf is not
+   created, there isn't a chance that a fruit will spawn in mid-air.
+5) Each fruit created by the tree will be associated with a collision callback.
+6) The fruit collision callback will be passed by the Game Manager, which
+   adds energy to the player when the fruit is collided.
+   Moreover, the fruit will disappear and respawn after a set amount of time.
+   This functionality is at the Game Manager since it's most fitting - It
+   has control over all the game objects, whereas the game objects each has
+   its own functionality, disconnected from the rest of the game.
+7) On player jump, the dispatcher will let the Flora know, and the Flora will
+   notify the trees to rotate their leaves and change their colors.
