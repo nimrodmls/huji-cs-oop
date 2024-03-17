@@ -16,9 +16,16 @@ import pepse.world.consumables.Consumable;
 import pepse.world.consumables.Fruit;
 import pepse.util.GameUtils;
 
+/**
+ * Controlling all the flora in the game.
+ * @author Nimrod M.
+ */
 public class Flora {
     private static final float TREE_SPAWN_CHANCE = 0.3f;
     private static final int TREE_DISTANCE = 3;
+    private static final float JUMP_LEAF_ROTATION = 90.0f;
+    private static final int BASE_STUMP_SIZE = 3;
+    private static  final int MAX_EXTRA_STUMP_SIZE = 5;
 
     private final Function<Float, Float> treeRootSupplier;
     private final Consumer<GameObject> staticObjectManager;
@@ -29,6 +36,17 @@ public class Flora {
     private final LinkedList<Color> fruitColorCycle;
     private Color currentFruitColor = GameConstants.DEFAULT_FRUIT_COLOR;
 
+    /**
+     * Construct a new flora manager. No flora is spawned when this constructor is called.
+     * @param treeRootSupplier The function that will be used to calculate the root of the tree
+     * @param staticObjectManager The function that will be used to manage static objects
+     *                            (objects that don't move)
+     * @param dynamicObjectManager The function that will be used to manage dynamic objects
+     *                             (objects that can move)
+     * @param treeFruitCollisionHandler The function that will be used to handle collisions
+     *                                  between trees and fruits
+     * @param dispatcher The dispatcher that will be used to register events
+     */
     public Flora(Function<Float, Float> treeRootSupplier,
                  Consumer<GameObject> staticObjectManager,
                  Consumer<GameObject> dynamicObjectManager,
@@ -49,6 +67,13 @@ public class Flora {
         fruitColorCycle.add(GameConstants.DEFAULT_FRUIT_COLOR);
     }
 
+    /**
+     * Creates trees in a given range.
+     * Trees have a spawn chance, so it is not guaranteed that trees will be created.
+     * @param minX The minimum x value for the range, it will be rounded to the nearest block size
+     * @param maxX The maximum x value for the range, it will be rounded to the nearest block size
+     * @return A list of all the trees created in the given range
+     */
     public ArrayList<Tree> createInRange(int minX, int maxX) {
 
         // Round the min and max x to the nearest block size
@@ -61,7 +86,7 @@ public class Flora {
             if (GameUtils.biasedCoinFlip(TREE_SPAWN_CHANCE)) {
                 float y = treeRootSupplier.apply(x);
                 Tree tree = new Tree(
-                        random.nextInt(5) + 3,
+                        random.nextInt(MAX_EXTRA_STUMP_SIZE) + BASE_STUMP_SIZE,
                         new Vector2(x, y),
                         currentFruitColor,
                         staticObjectManager,
@@ -74,12 +99,18 @@ public class Flora {
         return trees;
     }
 
+    /**
+     * Handles the event of the player jumping.
+     * This method is called when the player jumps, and it changes the color of the fruits,
+     * the color pattern of the stump and it rotates the leaves.
+     * This method is called by the event dispatcher.
+     */
     private void playerJumpCallback() {
         fruitColorCycle.add(currentFruitColor);
         currentFruitColor = fruitColorCycle.remove();
 
         for (Tree tree : trees) {
-            tree.rotateLeaves(90.0f);
+            tree.rotateLeaves(JUMP_LEAF_ROTATION);
             tree.resetStumpColor();
 
             for (Fruit fruit : tree.getFruits()) {

@@ -18,17 +18,31 @@ import pepse.world.consumables.Consumable;
 import pepse.world.consumables.Fruit;
 import pepse.util.GameUtils;
 
+/**
+ * A tree in the game. The tree is composed of a stump, leaves and fruits.
+ * The stump is impassable and immovable, the leaves are not interactd with, and the
+ * fruits are consumable.
+ * @author Nimrod M.
+ */
 public class Tree {
 
+    /**
+     * The size of a single stump link, might be useful for positioning of other objects.
+     */
     public static final int STUMP_LINK_SIZE = Block.BLOCK_SIZE;
     private static final int LEAF_SIZE = Block.BLOCK_SIZE;
     private static final Vector2 FRUIT_DIM = new Vector2(LEAF_SIZE / 2.0f, LEAF_SIZE / 2.0f);
-    // Determines the size of the square of leaves around the top link of the stump
+    /**
+     * Determines the size of the square of leaves around the top link of the stump
+     */
     private static final int LEAVES_DIMENSION = 5;
     private static final float MIN_LEAF_CYCLE_LENGTH = 5.0f;
     private static final float MAX_LEAF_CYCLE_LENGTH = 10.0f;
     private static final float MIN_LEAF_SCHED_START_TIME = 0.0f;
     private static final float MAX_LEAF_SCHED_START_TIME = 3.0f;
+    private static final float LEAF_ROTATION_TRANSITION_TIME = 1.0f;
+    private static final float LEAF_IDLE_ROTATION_START_ANGLE = 0.0f;
+    private static final float LEAF_IDLE_ROTATION_END_ANGLE = 60.0f;
     private static final float LEAF_SPAWN_CHANCE = 0.7f;
     private static final float FRUIT_SPAWN_CHANCE = 0.3f;
     private static final Color BASE_STUMP_COLOR = new Color(100, 50, 20);
@@ -43,6 +57,20 @@ public class Tree {
     // The fruits on the tree, it's of dynamic size since it's not known in advance
     private final ArrayList<Fruit> fruits;
 
+    /**
+     * Construct a new tree instance, spawns it at the requested root position
+     * and creates a random amount of leaves and consumable fruits.
+     * @param stumpLength The amount of links in the stump
+     * @param rootPosition The position of the root of the tree (top left corner)
+     * @param fruitColor The color of the fruits
+     * @param staticObjectManager The manager for static objects - through it
+     *                            the tree will add the stumps and leaves.
+     * @param interactiveObjectManager The manager for interactive objects - through it
+     *                                 the tree will add the fruits, so it can be interacted with.
+     * @param fruitCollisionHandler The handler for fruit collisions - upon collision with a fruit,
+     *                              the handler will be called with the fruit
+     *                              and the object it collided with.
+     */
     public Tree(int stumpLength,
                 Vector2 rootPosition,
                 Color fruitColor,
@@ -69,10 +97,16 @@ public class Tree {
                 fruitCollisionHandler);
     }
 
+    /**
+     * @return The fruits on the tree
+     */
     public ArrayList<Fruit> getFruits() {
         return fruits;
     }
 
+    /**
+     * Changes the color pattern of the tree's stump.
+     */
     public void resetStumpColor() {
         for (GameObject stumpLink : stumpLinks) {
             stumpLink.renderer().setRenderable(
@@ -80,6 +114,11 @@ public class Tree {
         }
     }
 
+    /**
+     * Rotates the leaves of the tree by the given angle, the rotation
+     * will be done in a smooth transition.
+     * @param rotationAngle The angle to rotate the leaves by
+     */
     public void rotateLeaves(float rotationAngle) {
         for (GameObject leaf : leaves) {
             inRotation = true;
@@ -89,12 +128,18 @@ public class Tree {
                     leaf.renderer().getRenderableAngle(),
                     leaf.renderer().getRenderableAngle() + rotationAngle,
                     Transition.LINEAR_INTERPOLATOR_FLOAT,
-                    1.0f,
+                    LEAF_ROTATION_TRANSITION_TIME,
                     Transition.TransitionType.TRANSITION_ONCE,
                     () -> inRotation = false);
         }
     }
 
+    /**
+     * Callback for the leaf's idle rotation transition, sets the leaf's angle
+     * to the given angle - If the leaf is currently being rotated, the angle is not changed.
+     * @param leaf The leaf to rotate
+     * @param angle The angle to rotate the leaf by
+     */
     private void leafIdleRotationCallback(GameObject leaf, float angle) {
         // If the leaf is currently being rotated, the angle is not changed,
         // it will be changed once the leaf is gone idle
@@ -105,6 +150,15 @@ public class Tree {
         leaf.renderer().setRenderableAngle(angle);
     }
 
+    /**
+     * Creates the leaves of the tree, and possibly adds a fruit to each leaf.
+     * @param rootPosition The position of the root of the tree (top left corner)
+     * @param stumpLength The amount of links in the stump
+     * @param fruitColor The color of the fruits
+     * @param staticObjectManager The manager for static objects
+     * @param interactiveObjectManager The manager for interactive objects
+     * @param fruitCollisionHandler The handler for fruit collisions
+     */
     private void createLeaves(
             Vector2 rootPosition,
             int stumpLength,
@@ -151,7 +205,16 @@ public class Tree {
         }
     }
 
-    private void createStump(int stumpLength, Vector2 rootPosition, Consumer<GameObject> staticObjectManager) {
+    /**
+     * Creates the stump of the tree. The stump is a series of blocks,
+     * each block is a link in the stump. The stump is immovable and impassable.
+     * @param stumpLength The amount of links in the stump
+     * @param rootPosition The position of the root of the tree (top left corner)
+     * @param staticObjectManager The manager for static objects
+     */
+    private void createStump(int stumpLength,
+                             Vector2 rootPosition,
+                             Consumer<GameObject> staticObjectManager) {
         for (int i = 0; i < stumpLength; i++) {
             Block stump = new Block(
                     rootPosition.subtract(new Vector2(0, i * STUMP_LINK_SIZE)),
@@ -162,14 +225,17 @@ public class Tree {
         }
     }
 
-    // Associates the given leaf with the super realistic moving transitions
+    /**
+     * Associates the given leaf with the super realistic moving transitions
+     * @param leaf The leaf to check
+     */
     private void createLeafTransitions(GameObject leaf) {
         Random random = new Random();
         new Transition<Float>(
                 leaf,
                 (Float angle) -> leafIdleRotationCallback(leaf, angle),
-                0.0f,
-                60.0f,
+                LEAF_IDLE_ROTATION_START_ANGLE,
+                LEAF_IDLE_ROTATION_END_ANGLE,
                 Transition.LINEAR_INTERPOLATOR_FLOAT,
                 random.nextFloat(MIN_LEAF_CYCLE_LENGTH, MAX_LEAF_CYCLE_LENGTH),
                 Transition.TransitionType.TRANSITION_BACK_AND_FORTH,
@@ -185,6 +251,11 @@ public class Tree {
                 null);
     }
 
+    /**
+     * Creates a new leaf game object - Created blank with no behavior.
+     * @param position The position of the leaf
+     * @return A new leaf game object
+     */
     private static GameObject createLeafObject(Vector2 position) {
         GameObject leaf = new GameObject(
                 position,
@@ -194,6 +265,13 @@ public class Tree {
         return leaf;
     }
 
+    /**
+     * Creates a new fruit game object, associated with the given collision handler
+     * @param position The position of the fruit
+     * @param fruitColor The color of the fruit
+     * @param fruitCollisionHandler The handler for fruit collisions
+     * @return A new fruit game object
+     */
     private static Fruit createFruitObject(Vector2 position,
                                            Color fruitColor,
                                            BiConsumer<Consumable, GameObject> fruitCollisionHandler) {

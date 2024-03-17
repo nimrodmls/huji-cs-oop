@@ -1,21 +1,32 @@
 package pepse.world.daynight;
 
+import java.awt.*;
+
 import danogl.GameObject;
 import danogl.components.CoordinateSpace;
 import danogl.components.Transition;
 import danogl.gui.rendering.OvalRenderable;
-import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-
-import java.awt.*;
 
 import pepse.util.GameConstants;
 
+/**
+ * The sun in the game. The sun moves in a circular path, and its position is updated every frame.
+ * @author Nimrod M.
+ */
 public class Sun {
+    private static final float SUN_START_ANGLE = 0.0f;
+    private static final float SUN_END_ANGLE = 360.0f;
     private static final Color SUN_COLOR = Color.YELLOW;
     private static final Vector2 SUN_SIZE = new Vector2(50, 50);
-    public static final String sunTag = "sun";
+    public static final String SUN_TAG = "sun";
 
+    /**
+     * Create a new sun game object
+     * @param windowDimensions The dimensions of the window
+     * @param cycleLength The length of the day-night cycle, in seconds
+     * @return A new sun game object
+     */
     public static GameObject create(Vector2 windowDimensions, float cycleLength) {
         GameObject sun = new GameObject(
                 Vector2.ZERO,
@@ -23,7 +34,7 @@ public class Sun {
                 new OvalRenderable(SUN_COLOR));
         // Setting the sun to move with the camera
         sun.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
-        sun.setTag(sunTag);
+        sun.setTag(SUN_TAG);
 
         float yCycleCenter = GameConstants.INITIAL_GROUND_HEIGHT_FACTOR * windowDimensions.y();
         Vector2 cycleCenter = new Vector2(
@@ -39,8 +50,8 @@ public class Sun {
                 (Float angle) -> sun.setCenter(
                         initialSunCenter.subtract(cycleCenter).rotated(angle).add(cycleCenter)
                 ),
-                0.0f,
-                360.0f,
+                SUN_START_ANGLE,
+                SUN_END_ANGLE,
                 Transition.LINEAR_INTERPOLATOR_FLOAT,
                 cycleLength,
                 Transition.TransitionType.TRANSITION_LOOP,
