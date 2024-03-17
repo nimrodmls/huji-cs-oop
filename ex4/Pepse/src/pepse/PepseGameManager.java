@@ -1,4 +1,4 @@
-package pepse.main;
+package pepse;
 
 import java.awt.*;
 import java.util.List;

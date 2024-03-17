@@ -19,7 +19,7 @@ public class Sun {
     private static final float SUN_END_ANGLE = 360.0f;
     private static final Color SUN_COLOR = Color.YELLOW;
     private static final Vector2 SUN_SIZE = new Vector2(50, 50);
-    public static final String SUN_TAG = "sun";
+    private static final String SUN_TAG = "sun";
 
     /**
      * Create a new sun game object
