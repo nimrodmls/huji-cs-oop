@@ -52,3 +52,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# EX3-specific
+ex3/AsciiArt/out.html
+ex3/AsciiArt/cat.jpeg
