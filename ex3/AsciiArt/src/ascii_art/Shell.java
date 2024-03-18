@@ -5,6 +5,7 @@ import image.Image;
 import shell_commands.ShellCommand;
 import shell_commands.ShellCommandFactory;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -34,7 +35,7 @@ public class Shell {
         Image defaultImage = null;
         try {
             defaultImage = new Image(DEFAULT_IMAGE_PATH);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println(DEFAULT_IMAGE_LOAD_ERROR_MESSAGE);
         }
 
