@@ -29,6 +29,12 @@
 - Wildcards
 - Generics invarience
 
+# Principles
+- Program to an interface, not an implementation
+- Single Responsibility
+- Open/Closed
+- Single Choice
+
 ## Design Patterns
 
 - Factory
